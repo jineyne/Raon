@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Compiler\" />
+    <Folder Include="VirtualMachine\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Raon.Native\Raon.Native.vcxproj" />
+  </ItemGroup>
+
+</Project>

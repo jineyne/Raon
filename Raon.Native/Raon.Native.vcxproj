@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{f23d1842-dc30-4758-a50b-569b0a2d8ec6}</ProjectGuid>
+    <RootNamespace>RaonNative</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <ShowIncludes>true</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AST\AssignOpNode.h" />
+    <ClInclude Include="AST\AST.h" />
+    <ClInclude Include="AST\ASTCPP.h" />
+    <ClInclude Include="AST\ASTMacros.h" />
+    <ClInclude Include="AST\BaseNode.h" />
+    <ClInclude Include="AST\ExprStmtNode.h" />
+    <ClInclude Include="AST\IntegerNode.h" />
+    <ClInclude Include="AST\BinOpNode.h" />
+    <ClInclude Include="AST\VarNode.h" />
+    <ClInclude Include="AST\CompoundNode.h" />
+    <ClInclude Include="FrontEnd\ColorGraph.h" />
+    <ClInclude Include="BackEnd\CompilerObject.h" />
+    <ClInclude Include="BackEnd\BackEndDefines.h" />
+    <ClInclude Include="Container\HashMap.h" />
+    <ClInclude Include="FrontEnd\Lexer.h" />
+    <ClInclude Include="FrontEnd\Parser.h" />
+    <ClInclude Include="FrontEnd\Token.h" />
+    <ClInclude Include="FrontEnd\TokenType.h" />
+    <ClInclude Include="FrontEnd\TokenValue.h" />
+    <ClInclude Include="Container\StringView.h" />
+    <ClInclude Include="AST\StringNode.h" />
+    <ClInclude Include="IL\AssignOp.h" />
+    <ClInclude Include="IL\BinOp.h" />
+    <ClInclude Include="IL\Compound.h" />
+    <ClInclude Include="IL\Expr.h" />
+    <ClInclude Include="IL\ExprStmt.h" />
+    <ClInclude Include="IL\IL.h" />
+    <ClInclude Include="IL\ILAssembler.h" />
+    <ClInclude Include="IL\ILContext.h" />
+    <ClInclude Include="IL\ILBase.h" />
+    <ClInclude Include="IL\ILMacros.h" />
+    <ClInclude Include="IL\ILType.h" />
+    <ClInclude Include="IL\Int.h" />
+    <ClInclude Include="IL\Real.h" />
+    <ClInclude Include="IL\Stmt.h" />
+    <ClInclude Include="IL\Str.h" />
+    <ClInclude Include="IL\Var.h" />
+    <ClInclude Include="Runtime\Instruction.h" />
+    <ClInclude Include="Utility\Math.h" />
+    <ClInclude Include="Symbol\SymbolTable.h" />
+    <ClInclude Include="Symbol\BaseSymbol.h" />
+    <ClInclude Include="BackEnd\Compiler.h" />
+    <ClInclude Include="Container\Array.h" />
+    <ClInclude Include="AST\RealNode.h" />
+    <ClInclude Include="AST\EmptyNode.h" />
+    <ClInclude Include="Symbol\Symbol.h" />
+    <ClInclude Include="Symbol\TypeSymbol.h" />
+    <ClInclude Include="FrontEnd\SyntaxAnalyzer.h" />
+    <ClInclude Include="Utility\Converter.h" />
+    <ClInclude Include="Utility\Error.h" />
+    <ClInclude Include="Container\String.h" />
+    <ClInclude Include="Container\FStringBuffer.h" />
+    <ClInclude Include="CoreMinimal.h" />
+    <ClInclude Include="Container\Stack.h" />
+    <ClInclude Include="AST\UnaryOpNode.h" />
+    <ClInclude Include="Utility\Regex.h" />
+    <ClInclude Include="String\UTF16.h" />
+    <ClInclude Include="Prerequisites\PlatformDefines.h" />
+    <ClInclude Include="Prerequisites\PrerequisitesUtil.h" />
+    <ClInclude Include="Prerequisites\StdHeaders.h" />
+    <ClInclude Include="Symbol\VarSymbol.h" />
+    <ClInclude Include="Utility\Utility.h" />
+    <ClInclude Include="Value\Value.h" />
+    <ClInclude Include="Value\ValueType.h" />
+    <ClInclude Include="Runtime\VM.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AST\AssignOpNode.c" />
+    <ClCompile Include="AST\BaseNode.c" />
+    <ClCompile Include="AST\ExprStmtNode.c" />
+    <ClCompile Include="AST\IntegerNode.c" />
+    <ClCompile Include="AST\BinOpNode.c" />
+    <ClCompile Include="AST\VarNode.c" />
+    <ClCompile Include="AST\CompoundNode.c" />
+    <ClCompile Include="FrontEnd\ColorGraph.c" />
+    <ClCompile Include="BackEnd\CompilerObject.c" />
+    <ClCompile Include="Container\HashMap.c" />
+    <ClCompile Include="BackEnd\Compiler.c" />
+    <ClCompile Include="Container\Array.c" />
+    <ClCompile Include="AST\RealNode.c" />
+    <ClCompile Include="AST\EmptyNode.c" />
+    <ClCompile Include="FrontEnd\Lexer.c" />
+    <ClCompile Include="FrontEnd\Parser.c" />
+    <ClCompile Include="FrontEnd\Token.c" />
+    <ClCompile Include="Container\StringView.c" />
+    <ClCompile Include="AST\StringNode.c" />
+    <ClCompile Include="IL\AssignOp.c" />
+    <ClCompile Include="IL\BinOp.c" />
+    <ClCompile Include="IL\Compound.c" />
+    <ClCompile Include="IL\Expr.c" />
+    <ClCompile Include="IL\ExprStmt.c" />
+    <ClCompile Include="IL\ILAssembler.c" />
+    <ClCompile Include="IL\ILContext.c" />
+    <ClCompile Include="IL\ILBase.c" />
+    <ClCompile Include="IL\ILType.c" />
+    <ClCompile Include="IL\Int.c" />
+    <ClCompile Include="IL\Real.c" />
+    <ClCompile Include="IL\Stmt.c" />
+    <ClCompile Include="IL\Str.c" />
+    <ClCompile Include="IL\Var.c" />
+    <ClCompile Include="Runtime\Instruction.c" />
+    <ClCompile Include="Utility\Math.c" />
+    <ClCompile Include="Symbol\SymbolTable.c" />
+    <ClCompile Include="Symbol\Symbol.c" />
+    <ClCompile Include="Symbol\TypeSymbol.c" />
+    <ClCompile Include="FrontEnd\SyntaxAnalyzer.c" />
+    <ClCompile Include="Utility\Error.c" />
+    <ClCompile Include="Container\Stack.c" />
+    <ClCompile Include="Container\String.c" />
+    <ClCompile Include="Container\FStringBuffer.c" />
+    <ClCompile Include="AST\UnaryOpNode.c" />
+    <ClCompile Include="Utility\Regex.c" />
+    <ClCompile Include="String\UTF16.c" />
+    <ClCompile Include="Symbol\VarSymbol.c" />
+    <ClCompile Include="Utility\Utility.c" />
+    <ClCompile Include="Value\Value.c" />
+    <ClCompile Include="Runtime\VM.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
