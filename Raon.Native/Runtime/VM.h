@@ -7,6 +7,7 @@ extern "C" {
 
 #include "CoreMinimal.h"
 #include "BackEnd/CompilerObject.h"
+#include "Symbol/SymbolTable.h"
 
 typedef struct {
     FCompilerObject *object;
@@ -18,12 +19,16 @@ typedef struct {
 
     size_t pc;
     FValue registers[16];
+
+    FSymbolTable *global;
 } FVM;
 
 DLL_EXPORT FVM *CreateVM();
 DLL_EXPORT void FreeVM(FVM *vm);
 
 DLL_EXPORT void Execute(FVM *vm, FCompilerObject *object);
+
+DLL_EXPORT void ExecuteSource(FVM *vm, u16 *str);
 
 #ifdef __cplusplus
 }

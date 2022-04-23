@@ -1,16 +1,13 @@
 #include "EmptyNode.h"
 
-FEmptyNode* CreateEmptyNode() {
-    FEmptyNode* node = malloc(sizeof(FEmptyNode));
-    node->type = AST_EMPTY;
-    node->hash = 0;
-
-    node->token = CreateToken(TOKEN_UNKNOWN, U16('\0'));
+FEmptyNode *CreateEmptyNode(AST_REQUIRE_ARGS) {
+    FEmptyNode *node = malloc(sizeof(FEmptyNode));
+    INIT_BASE_NODE(node, AST_EMPTY);
 
     return node;
 }
 
-void FreeEmptyNode(FEmptyNode* node) {
-    FreeToken(node->token);
+void FreeEmptyNode(FEmptyNode *node) {
+    FinitBaseNode(node);
     free(node);
 }

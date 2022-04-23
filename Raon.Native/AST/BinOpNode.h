@@ -10,12 +10,11 @@ extern "C" {
 typedef struct BinOpNode {
     AST_REQUIRED
 
-    FToken *op;
     FBaseNode *left;
     FBaseNode *right;
 } FBinOpNode;
 
-DLL_EXPORT FBinOpNode *CreateBinOpNode(FToken *token, FBaseNode *left, FBaseNode *right);
+DLL_EXPORT FBinOpNode *CreateBinOpNode(AST_REQUIRE_ARGS, FBaseNode *left, FBaseNode *right);
 DLL_EXPORT void FreeBinOpNode(FBinOpNode *node);
 
 #ifdef __cplusplus

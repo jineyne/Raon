@@ -14,7 +14,7 @@ typedef struct {
     FBaseNode *right;
 } FAssignOpNode;
 
-DLL_EXPORT FAssignOpNode *CreateAssignOpNode(FToken *token, FBaseNode *left, FBaseNode *right);
+DLL_EXPORT FAssignOpNode *CreateAssignOpNode(AST_REQUIRE_ARGS, FBaseNode *left, FBaseNode *right);
 DLL_EXPORT void FreeAssignNode(FAssignOpNode *node);
 
 #ifdef __cplusplus

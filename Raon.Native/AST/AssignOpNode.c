@@ -1,10 +1,8 @@
 #include "AssignOpNode.h"
 
-FAssignOpNode *CreateAssignOpNode(FToken *token, FBaseNode *left, FBaseNode *right) {
+FAssignOpNode *CreateAssignOpNode(AST_REQUIRE_ARGS, FBaseNode *left, FBaseNode *right) {
     FAssignOpNode *node = malloc(sizeof(FAssignOpNode));
-    node->type = AST_ASSIGNOP;
-    node->hash = CombineHash(HashString(left->token->str), HashString(right->token->str));
-    node->token = token;
+    INIT_BASE_NODE(node, AST_ASSIGNOP);
 
     node->left = left;
     node->right = right;
@@ -13,9 +11,10 @@ FAssignOpNode *CreateAssignOpNode(FToken *token, FBaseNode *left, FBaseNode *rig
 }
 
 void FreeAssignNode(FAssignOpNode *node) {
+    FinitBaseNode(node);
+
     FreeNode(node->left);
     FreeNode(node->right);
 
-    FreeToken(node->token);
     free(node);
 }

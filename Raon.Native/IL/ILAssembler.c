@@ -19,10 +19,10 @@
 typedef enum {
     PHASE_GENERATION,
     PHASE_SEARCH,
-};
+} EPhase;
 
-ILAssembler *CreateILAssembler() {
-    ILAssembler *assembler = malloc(sizeof(ILAssembler));
+FILAssembler *CreateILAssembler() {
+    FILAssembler *assembler = malloc(sizeof(FILAssembler));
     assembler->context = CreateILContext();
     assembler->graph = CreateColorGraph();
     assembler->phase = PHASE_GENERATION;
@@ -31,7 +31,11 @@ ILAssembler *CreateILAssembler() {
     return assembler;
 }
 
-void FreeILAssembler(ILAssembler *assembler) {
+void FreeILAssembler(FILAssembler *assembler) {
+    if (assembler == NULL) {
+        return;
+    }
+
     FreeILContext(assembler->context);
     free(assembler);
 }
@@ -47,27 +51,26 @@ typedef struct {
     FILBase *il;
 } FILAssemblerVisitResult;
 
-DEFINE_VISITER(FILAssemblerVisitResult, ILAssembler *);
+DEFINE_VISITER(FILAssemblerVisitResult, FILAssembler *)
 
-FILBase *ILGenerate(ILAssembler *assembler, FBaseNode *node) {
+FILBase *ILGenerate(FILAssembler *assembler, FBaseNode *node) {
     FILAssemblerVisitResult result = visit(assembler, node);
     if (result.success) {
         return result.il;
-    } else {
-        int error;
-        while ((error = GetError()) != ERROR_NONE) {
-            wprintf(U16("ERROR: %ls"), GetErrorString(error));
-        }
-
-        FreeIL(result.il);
-        return NULL;
     }
+    int error;
+    while ((error = GetError()) != ERROR_NONE) {
+        wprintf(U16("ERROR: %ls"), GetErrorString(error));
+    }
+
+    FreeIL(result.il);
+    return NULL;
 }
 
-IMPL_VISITER(FILAssemblerVisitResult, ILAssembler *);
+IMPL_VISITER(FILAssemblerVisitResult, FILAssembler *)
 
-#define BEGIN FILAssemblerVisitResult __result = { true, NULL };
-#define END return __result;
+#define BEGIN FILAssemblerVisitResult __result = { true, NULL }
+#define END return __result
 
 #define FAILED __result.success = false
 #define IS_FAILED __result.success == false
@@ -86,11 +89,27 @@ IMPL_VISITER(FILAssemblerVisitResult, ILAssembler *);
 #define ENTER_SEARCH_PHASE this->phase = PHASE_SEARCH
 #define ENTER_GENERATION_PHASE this->phase = PHASE_GENERATION
 
-FILAssemblerVisitResult visitAssignOpNode(ILAssembler *this, FAssignOpNode *node) {
+EOperation tokenToOp(FToken *str) {
+    switch (str->type) {
+    case TOKEN_PLUS:
+        return OPERATION_ADD;
+    case TOKEN_MINUS:
+        return OPERATION_SUB;
+    case TOKEN_ASTERISK:
+        return OPERATION_MUL;
+    case TOKEN_SLASH:
+        return OPERATION_DIV;
+    }
+
+    return OPERATION_UNKNOWN;
+}
+
+
+FILAssemblerVisitResult visitAssignOpNode(FILAssembler *this, FAssignOpNode *node) {
     BEGIN;
 
-    EXPR(left, node->left);
-    EXPR(right, node->right);
+    EXPR(left, node->left)
+    EXPR(right, node->right)
 
     GENERATION_PHASE
         IL = CreateAssignOp(left.il, right.il);
@@ -105,14 +124,14 @@ FILAssemblerVisitResult visitAssignOpNode(ILAssembler *this, FAssignOpNode *node
     END;
 }
 
-FILAssemblerVisitResult visitBinOpNode(ILAssembler *this, FBinOpNode *node) {
+FILAssemblerVisitResult visitBinOpNode(FILAssembler *this, FBinOpNode *node) {
     BEGIN;
 
-    EXPR(left, node->left);
-    EXPR(right, node->right);
+    EXPR(left, node->left)
+    EXPR(right, node->right)
 
     GENERATION_PHASE
-        EOperation op = StringToOp(node->op->op);
+        EOperation op = tokenToOp(node->location->token);
         if (op == OPERATION_UNKNOWN) {
             FAILED;
         } else {
@@ -130,7 +149,7 @@ FILAssemblerVisitResult visitBinOpNode(ILAssembler *this, FBinOpNode *node) {
     END;
 }
 
-FILAssemblerVisitResult visitCompoundNode(ILAssembler *this, FCompoundNode *node) {
+FILAssemblerVisitResult visitCompoundNode(FILAssembler *this, FCompoundNode *node) {
     BEGIN;
 
     FStmt **temp = this->statements;
@@ -155,7 +174,7 @@ FILAssemblerVisitResult visitCompoundNode(ILAssembler *this, FCompoundNode *node
     END;
 }
 
-FILAssemblerVisitResult visitIntegerNode(ILAssembler *this, FIntegerNode *node) {
+FILAssemblerVisitResult visitIntegerNode(FILAssembler *this, FIntegerNode *node) {
     BEGIN;
 
     GENERATION_PHASE
@@ -169,7 +188,7 @@ FILAssemblerVisitResult visitIntegerNode(ILAssembler *this, FIntegerNode *node) 
     END;
 }
 
-FILAssemblerVisitResult visitRealNode(ILAssembler *this, FRealNode *node) {
+FILAssemblerVisitResult visitRealNode(FILAssembler *this, FRealNode *node) {
     BEGIN;
 
     GENERATION_PHASE
@@ -184,7 +203,7 @@ FILAssemblerVisitResult visitRealNode(ILAssembler *this, FRealNode *node) {
     END;
 }
 
-FILAssemblerVisitResult visitStringNode(ILAssembler *this, FStringNode *node) {
+FILAssemblerVisitResult visitStringNode(FILAssembler *this, FStringNode *node) {
     BEGIN;
 
     GENERATION_PHASE
@@ -198,13 +217,13 @@ FILAssemblerVisitResult visitStringNode(ILAssembler *this, FStringNode *node) {
     END;
 }
 
-FILAssemblerVisitResult visitUnaryOpNode(ILAssembler *this, FUnaryOpNode *node) {
+FILAssemblerVisitResult visitUnaryOpNode(FILAssembler *this, FUnaryOpNode *node) {
     BEGIN;
 
     EXPR(expr, node->expr);
 
     GENERATION_PHASE
-        /*EOperation op = StringToOp(node->op->op);
+        /*EOperation op = tokenToOp(node->location->token);
         if (op == OPERATION_UNKNOWN) {
             FAILED;
         } else {
@@ -219,17 +238,17 @@ FILAssemblerVisitResult visitUnaryOpNode(ILAssembler *this, FUnaryOpNode *node) 
     END;
 }
 
-FILAssemblerVisitResult visitVarNode(ILAssembler *this, FVarNode *node) {
+FILAssemblerVisitResult visitVarNode(FILAssembler *this, FVarNode *node) {
     BEGIN;
 
     GENERATION_PHASE
         size_t addr = -1;
-        FSymbol *symbol = FindSymbol(this->local, node->token->str);
-        if (symbol != NULL) {
+        FSymbol *symbol = NULL;
+        if (FindSymbol(this->local, node->location->token->str, &symbol) == ERROR_NONE) {
             addr = symbol->slot;
         }
 
-        IL = CreateVar(node->token->str, addr);
+        IL = CreateVar(node->location->token->str, addr);
         IL->operand = GetColorFromGraph(this->graph, node);
     PHASE_END
 
@@ -240,7 +259,7 @@ FILAssemblerVisitResult visitVarNode(ILAssembler *this, FVarNode *node) {
     END;
 }
 
-FILAssemblerVisitResult visitExprStmtNode(ILAssembler *this, FExprStmtNode *node) {
+FILAssemblerVisitResult visitExprStmtNode(FILAssembler *this, FExprStmtNode *node) {
     BEGIN;
 
     EXPR(expr, node->expr);
@@ -257,7 +276,7 @@ FILAssemblerVisitResult visitExprStmtNode(ILAssembler *this, FExprStmtNode *node
     END;
 }
 
-FILAssemblerVisitResult visitEmptyNode(ILAssembler *this, FEmptyNode *node) {
+FILAssemblerVisitResult visitEmptyNode(FILAssembler *this, FEmptyNode *node) {
     BEGIN;
 
     END;

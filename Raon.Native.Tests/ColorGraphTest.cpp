@@ -3,6 +3,7 @@
 #include "AST/AST.h"
 #include "FrontEnd/Parser.h"
 #include "FrontEnd/ColorGraph.h"
+#include "Utility/Error.h"
 
 class ColorGraphVisiter : public ASTVisiter<bool> {
 private:
@@ -47,8 +48,8 @@ protected:
             return false;
         }
 
-        AddEdgeToGraph(graph, (FBaseNode *) node, node->left);
-        AddEdgeToGraph(graph, (FBaseNode *) node, node->right);
+        AddEdgeToGraph(graph, (FBaseNode*) node, node->left);
+        AddEdgeToGraph(graph, (FBaseNode*) node, node->right);
         AddEdgeToGraph(graph, node->left, node->right);
 
         return true;
@@ -89,10 +90,11 @@ protected:
 };
 
 TEST(ColorGraphTest, Total) {
-    setlocale(LC_ALL, "ko_KR.UTF-8");
-    FLexer *lexer = NULL;
-    FParser *parser = NULL;
-    FBaseNode *node = NULL;
+    SetLocale(LOCALE_KO);
+    ClearError();
+
+    FParser *parser = nullptr;
+    FBaseNode *node = nullptr;
     auto visiter = ColorGraphVisiter();
 
     {
@@ -100,14 +102,12 @@ TEST(ColorGraphTest, Total) {
         u16 *src = U16(R"(
 b = (1 + 10) / (3 - 4) - 1 * 6
 )");
-        EXPECT_NO_THROW(lexer = CreateLexer(src));
-        EXPECT_NO_THROW(parser = CreateParser(lexer));
+        EXPECT_NO_THROW(parser = CreateParserFromMemory(src));
         EXPECT_NO_THROW(node = Parse(parser));
 
-        EXPECT_FALSE(visiter.visit(node));
+        EXPECT_TRUE(visiter.visit(node));
 
         EXPECT_NO_THROW(FreeNode(node));
         EXPECT_NO_THROW(FreeParser(parser));
-        EXPECT_NO_THROW(FreeLexer(lexer));
     }
 }

@@ -10,7 +10,7 @@ extern "C" {
 typedef enum {
     IL_UNKNOWN,
 
-    IL_EXPRESSION   = 0x100,
+    IL_EXPRESSION = 0x100,
 
     IL_ASSIGNOP,
     IL_BINOP,
@@ -24,7 +24,7 @@ typedef enum {
     IL_EXPRESSION_END,
     IL_EXPRESSION_COUNT = IL_EXPRESSION_END - IL_EXPRESSION,
 
-    IL_STATEMENT    = 0x200,
+    IL_STATEMENT = 0x200,
 
     IL_COMPOUND,
     IL_EXPR_STATEMENT,
@@ -41,8 +41,6 @@ typedef enum {
 
     OPERATION_UNKNOWN,
 } EOperation;
-
-DLL_EXPORT EOperation StringToOp(FString *str);
 
 #ifdef __cplusplus
 }

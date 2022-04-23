@@ -3,8 +3,8 @@
 FILContext * CreateILContext() {
     FILContext *context = malloc(sizeof(FILContext));
 
-    context->globalSymTab = CreateSymbolTable(CreateString(U16("GLOBAL")), NULL);
-    context->localSymTab = CreateSymbolTable(CreateString(U16("LOCAL")), NULL);
+    context->globalSymTab = CreateSymbolTable(U16("GLOBAL"), NULL);
+    context->localSymTab = CreateSymbolTable(U16("LOCAL"), NULL);
 
     return context;
 }

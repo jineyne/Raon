@@ -13,7 +13,7 @@ typedef struct StringNode {
     FString *value;
 } FStringNode;
 
-DLL_EXPORT FStringNode *CreateStringNode(FToken *token, FString *value);
+DLL_EXPORT FStringNode *CreateStringNode(AST_REQUIRE_ARGS, FString *value);
 DLL_EXPORT void FreeStringNode(FStringNode *node);
 
 #ifdef __cplusplus

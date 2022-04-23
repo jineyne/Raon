@@ -10,14 +10,18 @@ extern "C" {
 #endif
 
 typedef struct Parser {
+    FString *source;
     FLexer *lexer;
     FToken *token;
 } FParser;
 
-DLL_EXPORT FParser *CreateParser(FLexer *lexer);
+DLL_EXPORT FParser *CreateParserFromMemory(u16 *source);
+
+// TODO:
+// DLL_EXPORT FParser *CreateParserFromFile(u16 *source);
 DLL_EXPORT void FreeParser(FParser *parser);
 
-DLL_EXPORT FBaseNode *Parse(FParser* parser);
+DLL_EXPORT FBaseNode *Parse(FParser *parser);
 
 #ifdef __cplusplus
 }

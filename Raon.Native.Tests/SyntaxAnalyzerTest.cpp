@@ -5,20 +5,21 @@
 #include "Utility/Error.h"
 
 TEST(SyntaxAnalyzerTest, RunSyntaxAnalyzer) {
-    FLexer *lexer = NULL;
-    FParser *parser = NULL;
-    FSyntaxAnalyzer *analyzer = NULL;
-    FBaseNode *node = NULL;
+    SetLocale(LOCALE_KO);
+    ClearError();
 
-    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer());
+    FParser *parser = nullptr;
+    FSyntaxAnalyzer *analyzer = nullptr;
+    FBaseNode *node = nullptr;
+
+    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer(NULL));
 
     {
         u16 *src = U16(R"(
 a = 10
 b = 1
 )");
-        EXPECT_NO_THROW(lexer = CreateLexer(src));
-        EXPECT_NO_THROW(parser = CreateParser(lexer));
+        EXPECT_NO_THROW(parser = CreateParserFromMemory(src));
         EXPECT_NO_THROW(node = Parse(parser));
 
         EXPECT_EQ(GetErrorCount(), 0);
@@ -28,7 +29,6 @@ b = 1
         EXPECT_EQ(GetErrorCount(), 0);
 
         EXPECT_NO_THROW(FreeParser(parser));
-        EXPECT_NO_THROW(FreeLexer(lexer));
     }
 
     EXPECT_NO_THROW(ClearSyntaxAnalyzer(analyzer));
@@ -38,8 +38,7 @@ b = 1
 a = b
 b = 1
 )");
-        EXPECT_NO_THROW(lexer = CreateLexer(src));
-        EXPECT_NO_THROW(parser = CreateParser(lexer));
+        EXPECT_NO_THROW(parser = CreateParserFromMemory(src));
         EXPECT_NO_THROW(node = Parse(parser));
 
         EXPECT_EQ(GetErrorCount(), 0);
@@ -49,7 +48,6 @@ b = 1
         EXPECT_EQ(GetErrorCount(), 1);
 
         EXPECT_NO_THROW(FreeParser(parser));
-        EXPECT_NO_THROW(FreeLexer(lexer));
     }
 
     EXPECT_NO_THROW(FreeSyntaxAnalyzer(analyzer));

@@ -2,13 +2,16 @@
 #define __BASENODE_H__
 
 #include "Prerequisites/PrerequisitesUtil.h"
-#include "FrontEnd/Token.h"
+#include "Location.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define AST_REQUIRED EASTType type; FToken *token; size_t hash;
+#define AST_REQUIRED EASTType type; FLocation *location; size_t hash;
+
+#define AST_REQUIRE_ARGS FString *source, FToken *token
+#define INIT_BASE_NODE(NODE, OP) InitBaseNode(NODE, OP, source, token)
 
 typedef enum ASTType {
     AST_NONE,
@@ -44,8 +47,11 @@ typedef struct BaseNode {
     AST_REQUIRED
 } FBaseNode;
 
+
+DLL_EXPORT void InitBaseNode(FBaseNode *node, EASTType type, AST_REQUIRE_ARGS);
+DLL_EXPORT void FinitBaseNode(FBaseNode *node);
+
 DLL_EXPORT void FreeNode(FBaseNode *node);
-DLL_EXPORT void PrintNode(FBaseNode *node);
 
 DLL_EXPORT bool IsStmtNode(FBaseNode *node);
 DLL_EXPORT bool IsExprNode(FBaseNode *node);

@@ -2,9 +2,9 @@
 
 #include "Utility/Error.h"
 
-FSymbolTable *CreateSymbolTable(FString *name, FSymbolTable *parent) {
+FSymbolTable *CreateSymbolTable(u16 *name, FSymbolTable *parent) {
     FSymbolTable *table = malloc(sizeof(FSymbolTable));
-    table->name = name;
+    table->name = CreateString(name);
     table->symbols = NULL;
     table->symbolsIndex = malloc(sizeof(HashMap));
 
@@ -20,6 +20,40 @@ FSymbolTable *CreateSymbolTable(FString *name, FSymbolTable *parent) {
         table->scope = parent->scope + 1;
         table->currentSlot = parent->currentSlot + 1;
     }
+
+    return table;
+}
+
+FSymbolTable *CopySymbolTable(u16 *name, FSymbolTable *original) {
+    FSymbolTable *table = malloc(sizeof(FSymbolTable));
+    table->name = CreateString(name);
+    table->symbols = NULL;
+
+    table->symbolsIndex = malloc(sizeof(HashMap));
+    if (hashmap_create(pow(2, 10), table->symbolsIndex) != 0) {
+        Critical(ERROR_ALLOC_FAIL);
+    }
+
+    FSymbol *it;
+    ARRAY_FOREACH(original->symbols, it) {
+        switch (it->symbolType) {
+        case SYMBOL_TYPE:
+            // SKIP
+            break;
+
+        case SYMBOL_VARIABLE:
+            InsertSymbol(table, CreateVarSymbol(it->name, it->type));
+            break;
+
+        case SYMBOL_FUNCTION:
+            // InsertSymbol(table, CreateFun(it->name, it->type));
+            break;
+        }
+    }
+
+    table->parent = original->parent;
+    table->scope = original->scope;
+    table->currentSlot = original->currentSlot;
 
     return table;
 }
@@ -41,56 +75,93 @@ void FreeSymbolTable(FSymbolTable *table) {
     free(table);
 }
 
-bool InsertSymbol(FSymbolTable *table, FSymbol *symbol) {
+int InsertSymbol(FSymbolTable *table, FSymbol *symbol) {
     if (symbol == NULL || table == NULL) {
-        PushError(ERROR_ARGUMENT_NULL);
-        return false;
+        return ERROR_ARGUMENT_NULL;
     }
 
-    if (hashmap_get(table->symbolsIndex, symbol->name->data, symbol->name->length) != NULL) {
-        PushError(ERROR_SYMBOL_DUPLICATED);
-        return false;
+    if (hashmap_get(table->symbolsIndex, symbol->name->data, symbol->name->length * sizeof(u16)) != NULL) {
+        return ERROR_SYMBOL_DUPLICATED;
     }
 
     symbol->slot = table->currentSlot++;
 
-    void *p = (void*)((uint64_t)ARRAY_SIZE(table->symbols) + 1);
-    hashmap_put(table->symbolsIndex, symbol->name->data, symbol->name->length, p);
+    void *p = (void*) ((ARRAY_SIZE(table->symbols)) + 1);
+    hashmap_put(table->symbolsIndex, symbol->name->data, symbol->name->length * sizeof(u16), p);
 
     ARRAY_PUSH(table->symbols, symbol);
 
-    return true;
+    return ERROR_NONE;
 }
 
-FSymbol *FindSymbol(FSymbolTable *table, FString *name) {
+int FindSymbol(FSymbolTable *table, FString *name, FSymbol **out) {
+    *out = NULL;
     if (name == NULL || table == NULL) {
-        PushError(ERROR_ARGUMENT_NULL);
-        return NULL;
+        return ERROR_ARGUMENT_NULL;
     }
 
-    void *p = hashmap_get(table->symbolsIndex, name->data, name->length);
+    void *p = hashmap_get(table->symbolsIndex, name->data, name->length * sizeof(u16));
     if (p == NULL) {
-        return NULL;
+        return ERROR_SYMBOL_NOT_FOUND;
     }
 
-    return table->symbols[(uint16_t)((uint64_t)p - 1)];
+    *out = table->symbols[(uint16_t) ((uint64_t) p - 1)];
+    return ERROR_NONE;
 }
 
-FSymbol *FindSymbolDeep(FSymbolTable *table, FString *name) {
+int FindSymbolDeep(FSymbolTable *table, FString *name, FSymbol **out) {
+    *out = NULL;
     if (name == NULL || table == NULL) {
-        PushError(ERROR_ARGUMENT_NULL);
-        return NULL;
+        return ERROR_ARGUMENT_NULL;
     }
 
-    FSymbol *symbol = FindSymbol(table, name);
+    FSymbol *symbol = NULL;
+    FindSymbol(table, name, &symbol);
     while (symbol == NULL) {
         table = table->parent;
         if (table == NULL) {
             break;
         }
 
-        symbol = FindSymbol(table, name);
+        FindSymbol(table, name, &symbol);
     }
 
-    return symbol;
+    if (symbol == NULL) {
+        return ERROR_SYMBOL_NOT_FOUND;
+    }
+
+    *out = symbol;
+    return ERROR_NONE;
+}
+
+bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src) {
+    if (dst == NULL || src == NULL) {
+        return false;
+    }
+
+    FSymbol *it;
+    ARRAY_FOREACH(src->symbols, it) {
+        FSymbol *found = NULL;
+        FindSymbol(dst, it->name, &found);
+        if (found == NULL) {
+            InsertSymbol(dst, it);
+        } else {
+            void *p = hashmap_get(dst->symbolsIndex, it->name->data, it->name->length * sizeof(u16));
+            if (p == NULL) {
+                Critical(ERROR_INVALID_TOKEN, U16("SymbolTable"), it->lineNo, 0);
+            }
+            dst->symbols[((int64_t) p - 1)] = it;
+
+            FreeSymbol(found);
+        }
+    }
+
+    ARRAY_CLEAR(src->symbols);
+
+    FreeString(src->name);
+    hashmap_destroy(src->symbolsIndex);
+    free(src->symbolsIndex);
+    free(src);
+
+    return true;
 }

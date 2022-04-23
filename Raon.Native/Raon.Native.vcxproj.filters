@@ -210,6 +210,12 @@
     <ClInclude Include="Runtime\Instruction.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="AST\Location.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Locale.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Container\Array.c">
@@ -360,6 +366,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Instruction.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AST\Location.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Locale.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

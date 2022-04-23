@@ -10,35 +10,46 @@ FLexer *CreateLexer(const u16 *source) {
 
     FLexer *lexer = malloc(sizeof(FLexer));
     lexer->source = CreateString(source);
+    lexer->cursor = 0;
+    lexer->currentChar = lexer->source->data[lexer->cursor];
+
+    lexer->line = 0;
     lexer->pos = 0;
-    lexer->currentChar = lexer->source->data[lexer->pos];
 
     return lexer;
 }
 
 void FreeLexer(FLexer *lexer) {
+    if (lexer == NULL) {
+        return;
+    }
+
+    FreeString(lexer->source);
     free(lexer);
 }
 
 static void advance(FLexer *lexer) {
-    lexer->pos += 1;
-    if (lexer->pos >= lexer->source->length) {
-        lexer->currentChar = EmptyString;
+    if (lexer->currentChar == '\n') {
+        lexer->line += 1;
+        lexer->pos = 0;
     }
-    else {
-        lexer->currentChar = lexer->source->data[lexer->pos];
+
+    lexer->pos += 1;
+    lexer->cursor += 1;
+    if (lexer->cursor >= lexer->source->length) {
+        lexer->currentChar = EmptyString;
+    } else {
+        lexer->currentChar = lexer->source->data[lexer->cursor];
     }
 }
 
 
 static u16 peek(FLexer *lexer) {
-    size_t peekPos = lexer->pos + 1;
+    size_t peekPos = lexer->cursor + 1;
     if (peekPos >= lexer->source->length) {
         return EmptyString;
     }
-    else {
-        return lexer->source->data[peekPos];
-    }
+    return lexer->source->data[peekPos];
 }
 
 static void skipWhitespace(FLexer *lexer) {
@@ -60,7 +71,7 @@ static FToken *number(FLexer *lexer) {
     skipWhitespace(lexer);
 
     if (lexer->currentChar == EmptyString || lexer->currentChar != U16('.')) {
-        return CreateTokenFromInteger(StringBufferToString(sb), integer);
+        return CreateTokenFromInteger(lexer->line, lexer->pos, StringBufferToString(sb), integer);
     }
 
     // REAL!
@@ -71,9 +82,9 @@ static FToken *number(FLexer *lexer) {
         advance(lexer);
     }
 
-    FString *str =  StringBufferToString(sb);
+    FString *str = StringBufferToString(sb);
     FreeStringBuffer(sb);
-    return CreateTokenFromReal(str, (double)integer + decimal);
+    return CreateTokenFromReal(lexer->line, lexer->pos, str, (double) integer + decimal);
 }
 
 static FToken *string(FLexer *lexer) {
@@ -91,7 +102,7 @@ static FToken *string(FLexer *lexer) {
 
     // skip "
     advance(lexer);
-    return CreateTokenFromString(StringBufferToString(sb));
+    return CreateTokenFromString(lexer->line, lexer->pos, StringBufferToString(sb));
 
 }
 
@@ -117,7 +128,7 @@ static FToken *identifier(FLexer *lexer) {
         }
     }*/
 
-    FToken *FToken = CreateToken(TOKEN_IDENTIFIER, U16('\0'));
+    FToken *FToken = CreateToken(TOKEN_IDENTIFIER, lexer->line, lexer->pos, U16('\0'));
     FToken->str = str;
     FreeStringBuffer(sb);
 
@@ -136,7 +147,7 @@ FToken *GetNextToken(FLexer *lexer) {
     while (lexer->currentChar != EmptyString) {
         if (lexer->currentChar == U16('\n')) {
             advance(lexer);
-            return CreateToken(TOKEN_EOL, U16('\0'));
+            return CreateToken(TOKEN_EOL, lexer->line, lexer->pos, U16('\0'));
         }
 
         if (u16isspace(lexer->currentChar)) {
@@ -150,37 +161,37 @@ FToken *GetNextToken(FLexer *lexer) {
 
         if (lexer->currentChar == U16('+')) {
             advance(lexer);
-            return CreateToken(TOKEN_PLUS, U16("+"));
+            return CreateToken(TOKEN_PLUS, lexer->line, lexer->pos, U16("+"));
         }
 
         if (lexer->currentChar == U16('-')) {
             advance(lexer);
-            return CreateToken(TOKEN_MINUS, U16("-"));
+            return CreateToken(TOKEN_MINUS, lexer->line, lexer->pos, U16("-"));
         }
 
         if (lexer->currentChar == U16('*')) {
             advance(lexer);
-            return CreateToken(TOKEN_ASTERISK, U16("*"));
+            return CreateToken(TOKEN_ASTERISK, lexer->line, lexer->pos, U16("*"));
         }
 
         if (lexer->currentChar == U16('/')) {
             advance(lexer);
-            return CreateToken(TOKEN_SLASH, U16("/"));
+            return CreateToken(TOKEN_SLASH, lexer->line, lexer->pos, U16("/"));
         }
 
         if (lexer->currentChar == U16('(')) {
             advance(lexer);
-            return CreateToken(TOKEN_LPAREN, U16("("));
+            return CreateToken(TOKEN_LPAREN, lexer->line, lexer->pos, U16("("));
         }
 
         if (lexer->currentChar == U16(')')) {
             advance(lexer);
-            return CreateToken(TOKEN_RPAREN, U16(")"));
+            return CreateToken(TOKEN_RPAREN, lexer->line, lexer->pos, U16(")"));
         }
 
         if (lexer->currentChar == U16('=')) {
             advance(lexer);
-            return CreateToken(TOKEN_ASSIGN, U16("="));
+            return CreateToken(TOKEN_ASSIGN, lexer->line, lexer->pos, U16("="));
         }
 
         if (lexer->currentChar == U16('"')) {
@@ -195,11 +206,11 @@ FToken *GetNextToken(FLexer *lexer) {
         return NULL;
     }
 
-    return CreateToken(TOKEN_EOF, U16('\0'));
+    return CreateToken(TOKEN_EOF, lexer->line, lexer->pos, U16('\0'));
 }
 
 FToken *GetIdentifier(FLexer *lexer) {
-    FToken* token = GetNextToken(lexer);
+    FToken *token = GetNextToken(lexer);
 
     if (token == NULL || token->type != TOKEN_IDENTIFIER) {
         FreeToken(token);
@@ -210,9 +221,10 @@ FToken *GetIdentifier(FLexer *lexer) {
 }
 
 FToken *GetSymbol(FLexer *lexer) {
-    FToken* token = GetNextToken(lexer);
+    FToken *token = GetNextToken(lexer);
 
-    if (token == NULL || !(token->type == TOKEN_IDENTIFIER || token->type == TOKEN_INTEGER || token->type == TOKEN_REAL || token->type == TOKEN_STRING || token->type > TOKEN_EOL)) {
+    if (token == NULL || !(token->type == TOKEN_IDENTIFIER || token->type == TOKEN_INTEGER || token->type == TOKEN_REAL
+        || token->type == TOKEN_STRING || token->type > TOKEN_EOL)) {
         FreeToken(token);
         return NULL;
     }

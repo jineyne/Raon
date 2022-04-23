@@ -1,9 +1,13 @@
 #include "pch.h"
 
 #include "FrontEnd/Lexer.h"
+#include "Utility/Error.h"
 
 TEST(LexerTest, GetNextToken) {
-    FLexer *lexer = NULL;
+    SetLocale(LOCALE_KO);
+    ClearError();
+
+    FLexer *lexer = nullptr;
     EXPECT_NO_THROW(lexer = CreateLexer(U16("1 + \"1\" * 2 - 3.0")));
 
     EXPECT_EQ(GetNextToken(lexer)->type, TOKEN_INTEGER);

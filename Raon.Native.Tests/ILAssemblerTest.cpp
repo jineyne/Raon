@@ -3,18 +3,20 @@
 #include "FrontEnd/Parser.h"
 #include "FrontEnd/SyntaxAnalyzer.h"
 #include "IL/ILBase.h"
-#include "IL/ILAssembler.h"
+#include "IL/FILAssembler.h"
 #include "Utility/Error.h"
 
 TEST(ILAssemblerTest, Global) {
-    FLexer *lexer = NULL;
-    FParser *parser = NULL;
-    FBaseNode *node = NULL;
+    SetLocale(LOCALE_KO);
+    ClearError();
 
-    FSyntaxAnalyzer *analyzer = NULL;
-    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer());
+    FParser *parser = nullptr;
+    FBaseNode *node = nullptr;
 
-    ILAssembler *assembler = NULL;
+    FSyntaxAnalyzer *analyzer = nullptr;
+    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer(NULL));
+
+    FILAssembler *assembler = nullptr;
     EXPECT_NO_THROW(assembler = CreateILAssembler());
 
 
@@ -23,10 +25,9 @@ TEST(ILAssemblerTest, Global) {
 a = (10 + 2) * 4 - 7
 b = 1 / a
 )");
-        EXPECT_NO_THROW(lexer = CreateLexer(src));
-        EXPECT_NO_THROW(parser = CreateParser(lexer));
+        EXPECT_NO_THROW(parser = CreateParserFromMemory(src));
         EXPECT_NO_THROW(node = Parse(parser));
-        
+
 
         EXPECT_EQ(GetErrorCount(), 0);
         EXPECT_EQ(node->type, AST_COMPOUND);
@@ -48,7 +49,6 @@ b = 1 / a
 
         EXPECT_NO_THROW(FreeNode(node));
         EXPECT_NO_THROW(FreeParser(parser));
-        EXPECT_NO_THROW(FreeLexer(lexer));
     }
 
     EXPECT_NO_THROW(FreeSyntaxAnalyzer(analyzer));

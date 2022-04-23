@@ -35,12 +35,12 @@ bool AddEdgeToGraph(FColorGraph *graph, FBaseNode *node1, FBaseNode *node2) {
     int id1 = (int) hashmap_get(graph->edgeIndex, &node1->hash, 8);
     if (id1 <= 0) {
         id1 = ARRAY_SIZE(graph->edges) + 1;
-        hashmap_put(graph->edgeIndex, &node1->hash, 8, (void *)(id1));
+        hashmap_put(graph->edgeIndex, &node1->hash, 8, (void*) (id1));
 
         edge1 = malloc(sizeof(FColorGraphEdge));
         ARRAY_PUSH(graph->edges, edge1);
 
-        edge1->key = node1->token->str;
+        edge1->key = node1->location->token->str;
         edge1->linked = NULL;
         edge1->color = -1;
     } else {
@@ -51,12 +51,12 @@ bool AddEdgeToGraph(FColorGraph *graph, FBaseNode *node1, FBaseNode *node2) {
     int id2 = (int) hashmap_get(graph->edgeIndex, &node2->hash, 8);
     if (id2 <= 0) {
         id2 = ARRAY_SIZE(graph->edges) + 1;
-        hashmap_put(graph->edgeIndex, &node2->hash, 8, (void *)(id2));
+        hashmap_put(graph->edgeIndex, &node2->hash, 8, (void*) (id2));
 
         edge2 = malloc(sizeof(FColorGraphEdge));
         ARRAY_PUSH(graph->edges, edge2);
 
-        edge2->key = node2->token->str;
+        edge2->key = node2->location->token->str;
         edge2->linked = NULL;
         edge2->color = -1;
     } else {
@@ -140,9 +140,8 @@ int GetColorFromGraph(FColorGraph *graph, FBaseNode *node1) {
     int id1 = (int) hashmap_get(graph->edgeIndex, &node1->hash, 8);
     if (id1 <= 0) {
         return -1;
-    } else {
-        edge1 = graph->edges[id1 - 1];
     }
+    edge1 = graph->edges[id1 - 1];
 
     return edge1->color;
 }

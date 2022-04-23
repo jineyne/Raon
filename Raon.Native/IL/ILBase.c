@@ -32,6 +32,10 @@ bool IsExpr(FILBase *il) {
 }
 
 void FreeIL(FILBase *il) {
+    if (il == NULL) {
+        return;
+    }
+
     switch (il->type) {
     case IL_ASSIGNOP:
         FreeAssignOp(il);

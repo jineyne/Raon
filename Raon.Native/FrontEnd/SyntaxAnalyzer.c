@@ -9,27 +9,33 @@ typedef enum {
     LValue,
 } EValueType;
 
-FSyntaxAnalyzer *CreateSyntaxAnalyzer() {
+FSyntaxAnalyzer *CreateSyntaxAnalyzer(FSymbolTable *table) {
     FSyntaxAnalyzer *analyzer = malloc(sizeof(FSyntaxAnalyzer));
 
-    analyzer->symtab = CreateSymbolTable(CreateString(U16("SyntaxAnalyzer")), NULL);
+    analyzer->symtab = table == NULL ? CreateSymbolTable(U16("SyntaxAnalyzer"), NULL) : table;
     analyzer->limit = NotValue;
+    analyzer->freeSymTab = table == NULL;
 
     return analyzer;
 }
 
 void FreeSyntaxAnalyzer(FSyntaxAnalyzer *analyzer) {
-    FSymbolTable *parent = NULL;
-    while (analyzer->symtab != NULL) {
-        parent = analyzer->symtab->parent;
+    if (analyzer == NULL) {
+        return;
+    }
 
-        FreeSymbolTable(analyzer->symtab);
-        analyzer->symtab = NULL;
+    if (analyzer->freeSymTab) {
+        while (analyzer->symtab != NULL) {
+            FSymbolTable *parent = analyzer->symtab->parent;
 
-        if (parent != NULL) {
-            analyzer->symtab = parent->parent;
+            FreeSymbolTable(analyzer->symtab);
+            analyzer->symtab = NULL;
+
+            if (parent != NULL) {
+                analyzer->symtab = parent->parent;
+            }
         }
-    };
+    }
 
     free(analyzer);
 }
@@ -39,7 +45,7 @@ typedef struct SyntaxAnalyzerResult {
     EValueType valueType;
 } FSyntaxAnalyzerResult;
 
-DEFINE_VISITER(FSyntaxAnalyzerResult, FSyntaxAnalyzer *);
+DEFINE_VISITER(FSyntaxAnalyzerResult, FSyntaxAnalyzer *)
 
 bool RunSyntaxAnalyzer(FSyntaxAnalyzer *analyzer, FBaseNode *node) {
     return visit(analyzer, node).success;
@@ -48,20 +54,23 @@ bool RunSyntaxAnalyzer(FSyntaxAnalyzer *analyzer, FBaseNode *node) {
 bool ClearSyntaxAnalyzer(FSyntaxAnalyzer *analyzer) {
     FSymbolTable *parent = analyzer->symtab->parent;
     do {
-        FreeSymbolTable(analyzer->symtab);
+        if (analyzer->freeSymTab) {
+            FreeSymbolTable(analyzer->symtab);
+            analyzer->symtab = NULL;
+        }
 
         if (parent != NULL) {
             parent = parent->parent;
         }
     } while (parent != NULL);
 
-    analyzer->symtab = CreateSymbolTable(CreateString(U16("SyntaxAnalyzer")), NULL);
+    analyzer->symtab = CreateSymbolTable(U16("SyntaxAnalyzer"), NULL);
     analyzer->limit = NotValue;
 
     return true;
 }
 
-IMPL_VISITER(FSyntaxAnalyzerResult, FSyntaxAnalyzer *);
+IMPL_VISITER(FSyntaxAnalyzerResult, FSyntaxAnalyzer *)
 
 #define BEGIN FSyntaxAnalyzerResult result = { true, NotValue }
 #define END return result
@@ -74,17 +83,19 @@ IMPL_VISITER(FSyntaxAnalyzerResult, FSyntaxAnalyzer *);
 #define VISIT_ANON(NODE) { FSyntaxAnalyzerResult __result = VISIT(NODE); if (!__result.success) FAILED; }
 #define VISIT_GRAP(NAME, NODE) FSyntaxAnalyzerResult NAME = VISIT(NODE); if (!NAME.success) FAILED;
 
+#define ERROR(ENUM, ...) CompileError(ENUM, node->location->source->data, node->location->token->line, node->location->token->pos, __VA_ARGS__)
+
 FSyntaxAnalyzerResult visitAssignOpNode(FSyntaxAnalyzer *this, FAssignOpNode *node) {
     BEGIN;
 
     this->limit = LValue;
-    VISIT_GRAP(left, node->left);
+    VISIT_GRAP(left, node->left)
 
     this->limit = RValue;
-    VISIT_GRAP(right, node->right);
+    VISIT_GRAP(right, node->right)
 
     if (left.valueType < LValue) {
-        PushError(ERROR_RVALUE_NOT_POSITION_AT_LVALUE);
+        ERROR(ERROR_RVALUE_NOT_POSITION_AT_LVALUE, node->left->location->token->str->data);
         FAILED;
     }
 
@@ -95,10 +106,10 @@ FSyntaxAnalyzerResult visitBinOpNode(FSyntaxAnalyzer *this, FBinOpNode *node) {
     BEGIN;
 
     this->limit = LValue;
-    VISIT_GRAP(left, node->left);
+    VISIT_GRAP(left, node->left)
 
     this->limit = RValue;
-    VISIT_GRAP(right, node->right);
+    VISIT_GRAP(right, node->right)
 
     END;
 }
@@ -108,7 +119,7 @@ FSyntaxAnalyzerResult visitCompoundNode(FSyntaxAnalyzer *this, FCompoundNode *no
 
     FBaseNode *it;
     ARRAY_FOREACH(node->children, it) {
-        VISIT_ANON(it);
+        VISIT_ANON(it)
     }
 
     END;
@@ -149,24 +160,26 @@ FSyntaxAnalyzerResult visitVarNode(FSyntaxAnalyzer *this, FVarNode *node) {
 
     RVALUE;
 
-    FSymbol *symbol = FindSymbol(this->symtab, node->token->str);
-    if (symbol == NULL) {
+    FSymbol *symbol = NULL;
+    int error = FindSymbol(this->symtab, node->location->token->str, &symbol);
+    if (error != ERROR_NONE) {
         // this is not declare case!
         // foo = [Unknown Var Name]
         if (this->limit == RValue) {
-            PushError(ERROR_SYMBOL_NOT_FOUND);
+            ERROR(ERROR_SYMBOL_NOT_FOUND, node->location->token->str->data);
             FAILED;
-        }
-    }
+        } else if (this->limit == LValue) {
+            // this is declare case!
+            symbol = (FSymbol*) CreateVarSymbol(node->location->token->str, NULL);
+            error = InsertSymbol(this->symtab, symbol);
+            if (error != ERROR_NONE) {
+                ERROR(error, node->location->token->str->data);
+                FAILED;
+            }
 
-    if (this->limit == LValue) {
-        // this is declare case!
-        FSymbol *symbol = CreateVarSymbol(node->token->str, NULL);
-        if (!InsertSymbol(this->symtab, symbol)) {
-            PushError(ERROR_INTERNAL_ERROR);
-            FAILED;
+            LVALUE;
         }
-
+    } else {
         LVALUE;
     }
 

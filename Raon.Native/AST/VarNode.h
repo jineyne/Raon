@@ -11,7 +11,7 @@ typedef struct VarNode {
     AST_REQUIRED
 } FVarNode;
 
-DLL_EXPORT FVarNode *CreateVarNode(FToken *token);
+DLL_EXPORT FVarNode *CreateVarNode(AST_REQUIRE_ARGS);
 DLL_EXPORT void FreeVarNode(FVarNode *node);
 
 #ifdef __cplusplus

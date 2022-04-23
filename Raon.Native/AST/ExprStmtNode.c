@@ -1,17 +1,17 @@
 ﻿#include "ExprStmtNode.h"
 
-FExprStmtNode *CreateExprStmtNode(FBaseNode *expr) {
-    FExprStmtNode *node = (FExprStmtNode *)malloc(sizeof(FExprStmtNode));
+FExprStmtNode *CreateExprStmtNode(AST_REQUIRE_ARGS, FBaseNode *expr) {
+    FExprStmtNode *node = malloc(sizeof(FExprStmtNode));
+    INIT_BASE_NODE(node, AST_EXPRSTMT);
 
-    node->type = AST_EXPRSTMT;
-    node->hash = CombineHash(expr->hash, expr->hash);
-    node->token = expr->token;
     node->expr = expr;
 
     return node;
 }
 
 void FreeExprStmtNode(FExprStmtNode *node) {
+    FinitBaseNode(node);
+
     FreeNode(node->expr);
     free(node);
 }

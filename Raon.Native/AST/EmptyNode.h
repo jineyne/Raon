@@ -11,7 +11,7 @@ typedef struct EmptyNode {
     AST_REQUIRED
 } FEmptyNode;
 
-DLL_EXPORT FEmptyNode *CreateEmptyNode();
+DLL_EXPORT FEmptyNode *CreateEmptyNode(AST_REQUIRE_ARGS);
 DLL_EXPORT void FreeEmptyNode(FEmptyNode *node);
 
 #ifdef __cplusplus

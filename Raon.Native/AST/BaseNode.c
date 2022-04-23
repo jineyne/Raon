@@ -11,7 +11,27 @@
 #include "StringNode.h"
 #include "VarNode.h"
 
+void InitBaseNode(FBaseNode *node, EASTType type, AST_REQUIRE_ARGS) {
+    node->type = type;
+    node->location = CreateLocation(source, token);
+    if (node->location->token->str != NULL) {
+        node->hash = HashString(node->location->token->str);
+    } else if (node->location->token->op != NULL) {
+        node->hash = HashString(node->location->token->op);
+    } else {
+        node->hash = 0;
+    }
+}
+
+void FinitBaseNode(FBaseNode *node) {
+    FreeLocation(node->location);
+}
+
 void FreeNode(FBaseNode *node) {
+    if (node == NULL) {
+        return;
+    }
+
     switch (node->type) {
     case AST_COMPOUND:
         FreeCompoundNode(node);
@@ -43,82 +63,6 @@ void FreeNode(FBaseNode *node) {
 
     default: ;
     }
-}
-
-#define INDENT_SIZE 2
-#define PRINT_INDENT for (int i = 0; i < indent * INDENT_SIZE; i++) { wprintf(U16(" ")); }
-#define PRINT(STMT) wprintf(U16(#STMT))
-#define LN  wprintf(U16("\n"))
-#define PRINTT(STMT) { wprintf(STMT); }
-#define PRINTF(STMT, ...) { wprintf(U16(" ")); } wprintf(U16(STMT), __VA_ARGS__)
-#define TO(TYPE) ((TYPE *) node)
-
-void printNodeInternal(FBaseNode *node, int indent) {
-    u16 buffer[8] = {0,};
-    FBaseNode *it;
-    switch (node->type) {
-    case AST_COMPOUND:
-        PRINT_INDENT PRINT(COMPOUND); LN;
-        ARRAY_FOREACH(((FCompoundNode *)node)->children, it) {
-            printNodeInternal(it, indent + 1);
-        }
-
-        break;
-    case AST_EXPRSTMT:
-        PRINT_INDENT PRINT(EXPRSTMT); LN;
-        printNodeInternal(TO(FExprStmtNode)->expr, indent + 1);
-        break;
-    case AST_EMPTY:
-        PRINT_INDENT PRINT(EMPTY); LN;
-        break;
-    case AST_ASSIGNOP:
-        PRINT_INDENT PRINT(ASSIGNOP); LN;
-
-        PRINT_INDENT PRINT(LEFT); LN;
-        printNodeInternal(TO(FAssignOpNode)->left, indent + 1);
-
-        PRINT_INDENT PRINT(RIGHT); LN;
-        printNodeInternal(TO(FAssignOpNode)->right, indent + 1);
-        break;
-    case AST_BINOP:
-        PRINT_INDENT PRINT(BINOP); LN;
-
-        PRINT_INDENT PRINT(LEFT); LN;
-        printNodeInternal(TO(FBinOpNode)->left, indent + 1);
-
-        buffer[0] = TO(FBinOpNode)->op->op;
-        PRINT_INDENT PRINTT("OP ") PRINTT(buffer); LN;
-        buffer[0] = '\0';
-
-        PRINT_INDENT PRINT(RIGHT); LN;
-        printNodeInternal(TO(FBinOpNode)->right, indent + 1);
-        break;
-    case AST_UNARYOP:
-        PRINT_INDENT PRINT(UNARYOP); LN;
-
-        PRINT_INDENT PRINTT(TO(FUnaryOpNode)->token->str->data); LN;
-        printNodeInternal(TO(FUnaryOpNode)->expr, indent + 1);
-        break;
-    case AST_INTEGER:
-        PRINT_INDENT PRINT(INTEGER); PRINTF(" %lld", TO(FIntegerNode)->value); LN;
-        break;
-    case AST_REAL:
-        PRINT_INDENT PRINT(REAL); PRINTF(" %llf", TO(FRealNode)->value); LN;
-        break;
-    case AST_STRING:
-        PRINT_INDENT PRINT(STRING); PRINTF(" %s", TO(FStringNode)->value->data); LN;
-        break;
-
-    case AST_VAR:
-        PRINT_INDENT PRINT(VAR); PRINTT(" ") PRINTT(TO(FVarNode)->token->str->data); LN;
-        break;
-
-    default: ;
-    }
-}
-
-void PrintNode(FBaseNode *node) {
-    printNodeInternal(node, 0);
 }
 
 bool IsStmtNode(FBaseNode *node) {

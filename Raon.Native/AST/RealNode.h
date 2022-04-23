@@ -13,8 +13,8 @@ typedef struct RealNode {
     double value;
 } FRealNode;
 
-DLL_EXPORT FRealNode *CreateRealNode(FToken *token, double value);
-DLL_EXPORT void FreeRealNode(FRealNode*node);
+DLL_EXPORT FRealNode *CreateRealNode(AST_REQUIRE_ARGS, double value);
+DLL_EXPORT void FreeRealNode(FRealNode *node);
 
 #ifdef __cplusplus
 }

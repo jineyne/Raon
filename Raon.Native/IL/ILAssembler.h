@@ -1,5 +1,5 @@
-#ifndef __ILASM_H__
-#define __ILASM_H__
+#ifndef __ILASSEMBLER_H__
+#define __ILASSEMBLER_H__
 
 #include "CoreMinimal.h"
 #include "ILContext.h"
@@ -19,15 +19,15 @@ typedef struct {
     FStmt **statements;
     FColorGraph *graph;
     char phase;
-} ILAssembler;
+} FILAssembler;
 
-DLL_EXPORT ILAssembler *CreateILAssembler();
-DLL_EXPORT void FreeILAssembler(ILAssembler *assembler);
+DLL_EXPORT FILAssembler *CreateILAssembler();
+DLL_EXPORT void FreeILAssembler(FILAssembler *assembler);
 
-DLL_EXPORT FILBase *ILGenerate(ILAssembler *assembler, FBaseNode *node);
+DLL_EXPORT FILBase *ILGenerate(FILAssembler *assembler, FBaseNode *node);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __ILASM_H__
+#endif // __ILASSEMBLER_H__

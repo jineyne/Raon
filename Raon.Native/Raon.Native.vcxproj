@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <ShowIncludes>true</ShowIncludes>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,6 +149,7 @@
     <ClInclude Include="AST\ExprStmtNode.h" />
     <ClInclude Include="AST\IntegerNode.h" />
     <ClInclude Include="AST\BinOpNode.h" />
+    <ClInclude Include="AST\Location.h" />
     <ClInclude Include="AST\VarNode.h" />
     <ClInclude Include="AST\CompoundNode.h" />
     <ClInclude Include="FrontEnd\ColorGraph.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="IL\Str.h" />
     <ClInclude Include="IL\Var.h" />
     <ClInclude Include="Runtime\Instruction.h" />
+    <ClInclude Include="Utility\Locale.h" />
     <ClInclude Include="Utility\Math.h" />
     <ClInclude Include="Symbol\SymbolTable.h" />
     <ClInclude Include="Symbol\BaseSymbol.h" />
@@ -213,6 +215,7 @@
     <ClCompile Include="AST\ExprStmtNode.c" />
     <ClCompile Include="AST\IntegerNode.c" />
     <ClCompile Include="AST\BinOpNode.c" />
+    <ClCompile Include="AST\Location.c" />
     <ClCompile Include="AST\VarNode.c" />
     <ClCompile Include="AST\CompoundNode.c" />
     <ClCompile Include="FrontEnd\ColorGraph.c" />
@@ -242,6 +245,7 @@
     <ClCompile Include="IL\Str.c" />
     <ClCompile Include="IL\Var.c" />
     <ClCompile Include="Runtime\Instruction.c" />
+    <ClCompile Include="Utility\Locale.c" />
     <ClCompile Include="Utility\Math.c" />
     <ClCompile Include="Symbol\SymbolTable.c" />
     <ClCompile Include="Symbol\Symbol.c" />

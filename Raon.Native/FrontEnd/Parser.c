@@ -2,93 +2,112 @@
 
 #include "Utility/Error.h"
 
-#define CHECK(x, t) if(!x) { FreeNode(node); node = NULL; if (t != NULL) { FreeToken(t); t = NULL; } return NULL; }
+#define CHECK(x, t) if(!x) { FreeNode((FBaseNode*) node); node = NULL; if (t != NULL) { FreeToken(t); t = NULL; } return NULL; }
 #define NULL_CHECK(x, t) if (x == NULL) { FreeNode(node); node = NULL; FreeToken(t); t = NULL; return NULL; }
 
-static bool eat(FParser *machine, char type);
-static FBaseNode *program(FParser *machine);
-static FBaseNode *compound(FParser *machine);
-static FBaseNode *statement(FParser *machine);
-static FBaseNode *assignStatement(FParser *machine);
-static FBaseNode *variable(FParser *machine);
-static FBaseNode *factor(FParser *machine);
-static FBaseNode *term(FParser *machine);
-static FBaseNode *expr(FParser *machine);
+#define ERROR(ERRNO, ...) CompileError(ERRNO, parser->source->data, parser->token->line, parser->token->pos, __VA_ARGS__)
 
-FParser *CreateParser(FLexer *lexer) {
+static bool eat(FParser *parser, char type);
+static FBaseNode *program(FParser *parser);
+static FBaseNode *compound(FParser *parser);
+static FBaseNode *statement(FParser *parser);
+static FBaseNode *assignStatement(FParser *parser);
+static FBaseNode *variable(FParser *parser);
+static FBaseNode *factor(FParser *parser);
+static FBaseNode *term(FParser *parser);
+static FBaseNode *expr(FParser *parser);
+
+//FParser *CreateParser(FLexer *lexer) {
+//    FParser *parser = malloc(sizeof(FParser));
+//
+//    parser->lexer = lexer;
+//    parser->token = GetNextToken(parser->lexer);
+//
+//    return parser;
+//}
+
+FParser *CreateParserFromMemory(u16 *source) {
     FParser *parser = malloc(sizeof(FParser));
 
-    parser->lexer = lexer;
+    parser->source = CreateString(U16("__inline_source"));
+    parser->lexer = CreateLexer(source);
+    parser->token = GetNextToken(parser->lexer);
+
+    return parser;
+}
+
+FParser *CreateParserFromFile(u16 *source) {
+    FParser *parser = malloc(sizeof(FParser));
+
+    parser->source = CreateString(source);
+    parser->lexer = CreateLexer(source);
     parser->token = GetNextToken(parser->lexer);
 
     return parser;
 }
 
 void FreeParser(FParser *parser) {
+    if (parser == NULL) {
+        return;
+    }
+
+    FreeLexer(parser->lexer);
+
     free(parser);
 }
 
 FBaseNode *Parse(FParser *parser) {
+    return program(parser);
+}
+
+static bool eat(FParser *parser, char type) {
+    if (parser->token->type == type) {
+        parser->token = GetNextToken(parser->lexer);
+        return (parser->token != NULL);
+    }
+    ERROR(ERROR_INVALID_SYNTAX, parser->token->str->data);
+    return false;
+}
+
+static bool eatAndFree(FParser *parser, char type) {
+    if (parser->token->type == type) {
+        FreeToken(parser->token);
+        parser->token = GetNextToken(parser->lexer);
+        return (parser->token != NULL);
+    }
+    FreeToken(parser->token);
+    parser->token = NULL;
+
+    ERROR(ERROR_INVALID_SYNTAX, parser->token->str->data);
+    return false;
+}
+
+static FBaseNode *program(FParser *parser) {
     FBaseNode *result = compound(parser);
 
-    if (parser->token->type != TOKEN_EOF) {
-        PushError(ERROR_INVALID_EOF);
-    }
+    // TODO?
 
     return result;
 }
 
-static bool eat(FParser *machine, char type) {
-    if (machine->token->type == type) {
-        machine->token = GetNextToken(machine->lexer);
-        return (machine->token != NULL);
-    } else {
-        PushError(ERROR_INVALID_SYNTAX);
-        return false;
-    }
-}
+static FBaseNode *compound(FParser *parser) {
+    FToken *token = CreateToken(TOKEN_UNKNOWN, parser->token->line, parser->token->pos, U16(""));
+    FCompoundNode *compound = CreateCompoundNode(parser->source, token);
 
-static bool eatAndFree(FParser *machine, char type) {
-    if (machine->token->type == type) {
-        FreeToken(machine->token);
-        machine->token = GetNextToken(machine->lexer);
-        return (machine->token != NULL);
-    } else {
-        FreeToken(machine->token);
-        machine->token = NULL;
-
-        PushError(ERROR_INVALID_SYNTAX);
-        return false;
-    }
-}
-
-static FBaseNode *program(FParser *machine) {
-    FBaseNode *result = compound(machine);
-
-    if (machine->token != NULL && machine->token->type != TOKEN_EOF) {
-        PushError(ERROR_INVALID_EOF);
-    }
-
-    FreeToken(machine->token);
-    return result;
-}
-
-static FBaseNode *compound(FParser *machine) {
-    FCompoundNode *compound = CreateCompoundNode();
     // eat begin
-    FBaseNode *node = statement(machine);
+    FBaseNode *node = statement(parser);
     if (node == NULL) {
         goto failed;
     }
 
     AppendASTNode(compound, node);
 
-    while (machine->token->type == TOKEN_EOL) {
-        if (!eat(machine, TOKEN_EOL)) {
+    while (parser->token->type == TOKEN_EOL) {
+        if (!eat(parser, TOKEN_EOL)) {
             break;
         }
 
-        FBaseNode *node = statement(machine);
+        node = statement(parser);
         if (node == NULL) {
             goto failed;
         }
@@ -96,9 +115,8 @@ static FBaseNode *compound(FParser *machine) {
         AppendASTNode(compound, node);
     }
 
-    if (machine->token->type == TOKEN_IDENTIFIER) {
-        // TODO: set error;
-        // AddError();
+    if (parser->token->type == TOKEN_IDENTIFIER) {
+        ERROR(ERROR_INVALID_TOKEN, parser->token->str->data);
         goto failed;
     }
 
@@ -109,122 +127,127 @@ failed:
     compound = NULL;
 
 success:
-    return compound;
+    return (FBaseNode*) compound;
 }
 
-static FBaseNode *statement(FParser *machine) {
-    bool isExistParam = false;
+static FBaseNode *statement(FParser *parser) {
     FBaseNode *node = NULL;
 
-    if (machine->token->type == TOKEN_LPAREN) {
-        eat(machine, TOKEN_LPAREN);
-        node = expr(machine);
-        if (!eat(machine, TOKEN_LPAREN)) {
+    if (parser->token->type == TOKEN_LPAREN) {
+        eat(parser, TOKEN_LPAREN);
+        node = expr(parser);
+        if (!eat(parser, TOKEN_LPAREN)) {
             return NULL;
         }
 
-
-        CHECK(eat(machine, TOKEN_RPAREN), node);
-    } else if (machine->token->type == TOKEN_IDENTIFIER) {
-        return assignStatement(machine);
-    } else {
-        return CreateEmptyNode();
+        CHECK(eat(parser, TOKEN_RPAREN), parser->token)
+        return node;
     }
+    if (parser->token->type == TOKEN_IDENTIFIER) {
+        return assignStatement(parser);
+    }
+
+    return (FBaseNode*) CreateEmptyNode(parser->source, parser->token);
 }
 
-static FBaseNode *assignStatement(FParser *machine) {
-    FBaseNode *lvalue = variable(machine);
-    FToken *token = machine->token;
+static FBaseNode *assignStatement(FParser *parser) {
+    FBaseNode *lvalue = variable(parser);
+    FToken *token = parser->token;
 
-    if (!eat(machine, TOKEN_ASSIGN)) {
-        PushError(ERROR_INVALID_TOKEN);
-        FreeToken(lvalue);
+    if (!eat(parser, TOKEN_ASSIGN)) {
+        ERROR(ERROR_INVALID_TOKEN);
+        FreeNode(lvalue);
 
         return NULL;
     }
 
-    FBaseNode *rvalue = expr(machine);
-    FBaseNode *assignOp = CreateAssignOpNode(token, lvalue, rvalue);
-    return CreateExprStmtNode(assignOp);
+    FBaseNode *rvalue = expr(parser);
+    FBaseNode *assignOp = (FBaseNode*) CreateAssignOpNode(parser->source, token, lvalue, rvalue);
+    return (FBaseNode*) CreateExprStmtNode(parser->source, parser->token, assignOp);
 }
 
-static FBaseNode *variable(FParser *machine) {
-    FVarNode *var = CreateVarNode(machine->token);
-    eat(machine, TOKEN_IDENTIFIER);
-    return var;
+static FBaseNode *variable(FParser *parser) {
+    FVarNode *var = CreateVarNode(parser->source, parser->token);
+    eat(parser, TOKEN_IDENTIFIER);
+    return (FBaseNode*) var;
 }
 
-static FBaseNode *factor(FParser *machine) {
-    FToken *token = machine->token;
+static FBaseNode *factor(FParser *parser) {
+    FToken *token = parser->token;
     FBaseNode *node = NULL;
     if (token->type == TOKEN_INTEGER) {
-        CHECK(eat(machine, TOKEN_INTEGER), token);
-        return CreateIntegerNode(token, token->value.integer);
-    } else if (token->type == TOKEN_REAL) {
-        CHECK(eat(machine, TOKEN_REAL), token);
-        return CreateRealNode(token, token->value.real);
-    } else if (token->type == TOKEN_STRING) {
-        CHECK(eat(machine, TOKEN_STRING), token);
-        return CreateStringNode(token, token->str);
-    } else if (token->type == TOKEN_LPAREN) {
-        CHECK(eat(machine, TOKEN_LPAREN), token);
+        CHECK(eat(parser, TOKEN_INTEGER), token)
+        return (FBaseNode*) CreateIntegerNode(parser->source, token, token->value.integer);
+    }
+    if (token->type == TOKEN_REAL) {
+        CHECK(eat(parser, TOKEN_REAL), token)
+        return (FBaseNode*) CreateRealNode(parser->source, token, token->value.real);
+    }
+    if (token->type == TOKEN_STRING) {
+        CHECK(eat(parser, TOKEN_STRING), token)
+        return (FBaseNode*) CreateStringNode(parser->source, token, token->str);
+    }
+    if (token->type == TOKEN_LPAREN) {
+        CHECK(eat(parser, TOKEN_LPAREN), token)
         FreeToken(token);
         token = NULL;
 
-        node = expr(machine);
-        NULL_CHECK(node, token);
-        CHECK(eatAndFree(machine, TOKEN_RPAREN), token);
+        node = expr(parser);
+        NULL_CHECK(node, token)
+        CHECK(eatAndFree(parser, TOKEN_RPAREN), token)
         return node;
-    } else if (token->type == TOKEN_MINUS) {
-        CHECK(eat(machine, TOKEN_MINUS), token);
-        node = CreateUnaryOpNode(token, factor(machine));
-        NULL_CHECK(node, token);
+    }
+    if (token->type == TOKEN_MINUS) {
+        CHECK(eat(parser, TOKEN_MINUS), token)
+        node = (FBaseNode*) CreateUnaryOpNode(parser->source, token, factor(parser));
+        NULL_CHECK(node, token)
         return node;
-    } else if (token->type == TOKEN_IDENTIFIER) {
-        CHECK(eat(machine, TOKEN_IDENTIFIER), token);
-        node = CreateVarNode(token);
-        NULL_CHECK(node, token);
+    }
+    if (token->type == TOKEN_IDENTIFIER) {
+        CHECK(eat(parser, TOKEN_IDENTIFIER), token)
+        node = (FBaseNode*) CreateVarNode(parser->source, token);
+        NULL_CHECK(node, token)
         return node;
     }
 
     return NULL;
 }
 
-static FBaseNode *term(FParser *machine) {
-    FBaseNode *node = factor(machine);
-    NULL_CHECK(node, machine->token);
+static FBaseNode *term(FParser *parser) {
+    FBaseNode *node = factor(parser);
+    NULL_CHECK(node, parser->token)
 
-    while (machine->token->type == TOKEN_ASTERISK || machine->token->type == TOKEN_SLASH) {
-        FToken *token = machine->token;
+    while (parser->token->type == TOKEN_ASTERISK || parser->token->type == TOKEN_SLASH) {
+        FToken *token = parser->token;
         if (token->type == TOKEN_ASTERISK) {
-            CHECK(eat(machine, TOKEN_ASTERISK), token);
+            CHECK(eat(parser, TOKEN_ASTERISK), token)
         } else {
-            CHECK(eat(machine, TOKEN_SLASH), token);
+            CHECK(eat(parser, TOKEN_SLASH), token)
         }
-        FBaseNode *temp = factor(machine);
-        NULL_CHECK(temp, token);
+        FBaseNode *temp = factor(parser);
+        NULL_CHECK(temp, token)
 
-        node = CreateBinOpNode(token, node, temp);
+        node = (FBaseNode*) CreateBinOpNode(parser->source, token, node, temp);
     }
 
     return node;
 }
 
-static FBaseNode *expr(FParser *machine) {
-    FBaseNode *node = term(machine);
-    NULL_CHECK(node, machine->token);
+static FBaseNode *expr(FParser *parser) {
+    FBaseNode *node = term(parser);
+    NULL_CHECK(node, parser->token)
 
-    while (machine->token->type == TOKEN_PLUS || machine->token->type == TOKEN_MINUS) {
-        FToken *token = machine->token;
+    while (parser->token->type == TOKEN_PLUS || parser->token->type == TOKEN_MINUS) {
+        FToken *token = parser->token;
         if (token->type == TOKEN_PLUS) {
-            CHECK(eat(machine, TOKEN_PLUS), token);
+            CHECK(eat(parser, TOKEN_PLUS), token)
         } else {
-            CHECK(eat(machine, TOKEN_MINUS), token);
+            CHECK(eat(parser, TOKEN_MINUS), token)
         }
-        FBaseNode *temp = term(machine);
-        NULL_CHECK(temp, token);
+        FBaseNode *temp = term(parser);
+        NULL_CHECK(temp, token)
 
-        node = CreateBinOpNode(token, node, temp);
+        node = (FBaseNode*) CreateBinOpNode(parser->source, token, node, temp);
     }
 
     return node;

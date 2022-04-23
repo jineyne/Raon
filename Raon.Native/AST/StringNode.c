@@ -1,11 +1,8 @@
 #include "StringNode.h"
 
-FStringNode *CreateStringNode(FToken *token, FString *value) {
+FStringNode *CreateStringNode(AST_REQUIRE_ARGS, FString *value) {
     FStringNode *node = malloc(sizeof(FStringNode));
-    node->type = AST_STRING;
-    node->hash = HashString(value);
-
-    node->token = token;
+    INIT_BASE_NODE(node, AST_STRING);
     node->value = value;
 
     return node;

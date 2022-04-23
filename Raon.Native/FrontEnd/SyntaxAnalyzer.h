@@ -12,9 +12,10 @@ extern "C" {
 typedef struct SyntaxAnalyzer {
     FSymbolTable *symtab;
     unsigned char limit;
+    bool freeSymTab;
 } FSyntaxAnalyzer;
 
-DLL_EXPORT FSyntaxAnalyzer *CreateSyntaxAnalyzer();
+DLL_EXPORT FSyntaxAnalyzer *CreateSyntaxAnalyzer(FSymbolTable *table);
 DLL_EXPORT void FreeSyntaxAnalyzer(FSyntaxAnalyzer *analyzer);
 
 DLL_EXPORT bool RunSyntaxAnalyzer(FSyntaxAnalyzer *analyzer, FBaseNode *node);

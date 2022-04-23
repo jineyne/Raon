@@ -10,7 +10,12 @@ extern "C" {
 
 typedef struct Lexer {
     FString *source;
+
+    size_t line;
     size_t pos;
+
+    size_t cursor;
+
     u16 currentChar;
 } FLexer;
 

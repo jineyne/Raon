@@ -7,6 +7,26 @@
 extern "C" {
 #endif
 
+typedef struct {
+    u16 *notImplement;
+    u16 *argumentNull;
+    u16 *internalError;
+
+    u16 *invalidToken;
+    u16 *invalidSyntax;
+    u16 *invalidEof;
+    u16 *invalidIdentifier;
+
+    u16 *symbolDuplicated;
+    u16 *symbolNotFound;
+    u16 *rvalueNotPositionAtLValue;
+
+    u16 *allocFailed;
+
+    u16 *stackOverflow;
+    u16 *stackUnderflow;
+} FErrorStringDesc;
+
 enum {
     ERROR_NONE,
 
@@ -17,7 +37,6 @@ enum {
     ERROR_INVALID_TOKEN,
     ERROR_INVALID_SYNTAX,
     ERROR_INVALID_EOF,
-    ERROR_INVALID_OP_CODE,
     ERROR_INVALID_IDENTIFIER,
 
     ERROR_SYMBOL_DUPLICATED,
@@ -35,8 +54,16 @@ enum {
 DLL_EXPORT int GetErrorCount();
 DLL_EXPORT int GetError();
 DLL_EXPORT void ClearError();
-DLL_EXPORT void PushError(int type);
-DLL_EXPORT void Critical(int type);
+
+DLL_EXPORT void CompileInfo(int type, u16 *file, size_t line, size_t pos, ...);
+DLL_EXPORT void CompileWarning(int type, u16 *file, size_t line, size_t pos, ...);
+DLL_EXPORT void CompileError(int type, u16 *file, size_t line, size_t pos, ...);
+
+DLL_EXPORT void Info(int type, ...);
+DLL_EXPORT void Warning(int type, ...);
+DLL_EXPORT void Error(int type, ...);
+DLL_EXPORT void Critical(int type, ...);
+
 DLL_EXPORT u16 *GetErrorString(int type);
 
 #ifdef __cplusplus

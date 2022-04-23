@@ -1,21 +1,20 @@
 #include "CompoundNode.h"
 
-FCompoundNode *CreateCompoundNode() {
+FCompoundNode *CreateCompoundNode(AST_REQUIRE_ARGS) {
     FCompoundNode *node = malloc(sizeof(FCompoundNode));
-    node->type = AST_COMPOUND;
-    node->hash = 0;
+    INIT_BASE_NODE(node, AST_COMPOUND);
 
-    node->token = CreateToken(TOKEN_UNKNOWN, U16('\0'));
     node->children = NULL;
 }
 
 void FreeCompoundNode(FCompoundNode *node) {
+    FinitBaseNode(node);
+
     FBaseNode *it;
     ARRAY_FOREACH(node->children, it) {
         FreeNode(it);
     }
 
-    FreeToken(node->token);
     free(node);
 }
 

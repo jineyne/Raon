@@ -13,6 +13,10 @@ FCompilerObject *CreateCompilerObject() {
 }
 
 void FreeCompilerObject(FCompilerObject *object) {
+    if (object == NULL) {
+        return;
+    }
+
     ARRAY_FREE(object->codes);
 }
 

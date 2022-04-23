@@ -13,8 +13,8 @@ typedef struct IntegerNode {
     int64_t value;
 } FIntegerNode;
 
-DLL_EXPORT FIntegerNode*CreateIntegerNode(FToken *token, int64_t value);
-DLL_EXPORT void FreeIntegerNode(FIntegerNode*node);
+DLL_EXPORT FIntegerNode *CreateIntegerNode(AST_REQUIRE_ARGS, int64_t value);
+DLL_EXPORT void FreeIntegerNode(FIntegerNode *node);
 
 #ifdef __cplusplus
 }

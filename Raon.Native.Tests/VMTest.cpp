@@ -4,24 +4,27 @@
 #include "FrontEnd/SyntaxAnalyzer.h"
 #include "BackEnd/Compiler.h"
 #include "Runtime/VM.h"
-#include "IL/ILAssembler.h"
+#include "IL/FILAssembler.h"
 #include "Utility/Error.h"
 
 TEST(VMTest, Global) {
-    FLexer *lexer = NULL;
-    FParser *parser = NULL;
-    FBaseNode *node = NULL;
+    SetLocale(LOCALE_KO);
+    ClearError();
 
-    FSyntaxAnalyzer *analyzer = NULL;
-    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer());
 
-    ILAssembler *assembler = NULL;
+    FParser *parser = nullptr;
+    FBaseNode *node = nullptr;
+
+    FSyntaxAnalyzer *analyzer = nullptr;
+    EXPECT_NO_THROW(analyzer = CreateSyntaxAnalyzer(NULL));
+
+    FILAssembler *assembler = nullptr;
     EXPECT_NO_THROW(assembler = CreateILAssembler());
 
-    FCompiler *compiler = NULL;
+    FCompiler *compiler = nullptr;
     EXPECT_NO_THROW(compiler = CreateCompiler());
 
-    FVM *vm = NULL;
+    FVM *vm = nullptr;
     EXPECT_NO_THROW(vm = CreateVM());
 
 
@@ -30,8 +33,7 @@ TEST(VMTest, Global) {
 a = (10 + 2) * 4 - 7
 b = 1 / a
 )");
-        EXPECT_NO_THROW(lexer = CreateLexer(src));
-        EXPECT_NO_THROW(parser = CreateParser(lexer));
+        EXPECT_NO_THROW(parser = CreateParserFromMemory(src));
         EXPECT_NO_THROW(node = Parse(parser));
 
 
@@ -44,7 +46,7 @@ b = 1 / a
 
         assembler->local = analyzer->symtab;
 
-        FILBase *il = NULL;
+        FILBase *il = nullptr;
         EXPECT_NO_THROW(il = ILGenerate(assembler, node));
 
         FCompilerObject *object = CompileIL(compiler, il);
@@ -59,11 +61,25 @@ b = 1 / a
 
         EXPECT_NO_THROW(FreeNode(node));
         EXPECT_NO_THROW(FreeParser(parser));
-        EXPECT_NO_THROW(FreeLexer(lexer));
     }
 
     EXPECT_NO_THROW(FreeVM(vm));
     EXPECT_NO_THROW(FreeCompiler(compiler));
     EXPECT_NO_THROW(FreeSyntaxAnalyzer(analyzer));
     EXPECT_NO_THROW(FreeILAssembler(assembler));
+}
+
+TEST(VMTest, Interpret) {
+    FVM *vm = CreateVM();
+
+    ExecuteSource(vm, U16("a = 10 * 6 - 7 * 13"));
+    EXPECT_EQ(GetErrorCount(), 0);
+
+    ExecuteSource(vm, U16("b = a * 10\nb = a * c"));
+    EXPECT_EQ(GetErrorCount(), 1);
+
+    ExecuteSource(vm, U16("b = a * 10;"));
+    EXPECT_EQ(GetErrorCount(), 1);
+
+    FreeVM(vm);
 }

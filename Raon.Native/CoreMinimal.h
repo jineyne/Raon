@@ -8,6 +8,7 @@
 #include "Container/Stack.h"
 #include "Container/String.h"
 
+#include "Utility/Locale.h"
 #include "Utility/Utility.h"
 
 typedef struct hashmap_s HashMap;

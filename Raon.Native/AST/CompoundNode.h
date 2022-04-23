@@ -12,7 +12,7 @@ typedef struct CompoundNode {
     FBaseNode **children;
 } FCompoundNode;
 
-DLL_EXPORT FCompoundNode *CreateCompoundNode();
+DLL_EXPORT FCompoundNode *CreateCompoundNode(AST_REQUIRE_ARGS);
 DLL_EXPORT void FreeCompoundNode(FCompoundNode *node);
 
 DLL_EXPORT void AppendASTNode(FCompoundNode *node, FBaseNode *ast);

@@ -1,7 +1,7 @@
 ﻿#include "String.h"
 
-FString* CreateString(const u16* str) {
-    FString* string = malloc(sizeof(FString));
+FString *CreateString(const u16 *str) {
+    FString *string = malloc(sizeof(FString));
 
     string->length = u16len(str);
     string->data = malloc(sizeof(u16) * (string->length + 1));
@@ -12,8 +12,20 @@ FString* CreateString(const u16* str) {
     return string;
 }
 
-FString* CreateStringWithLength(const u16* str, size_t len) {
-    FString* string = malloc(sizeof(FString));
+FString *CopyString(const FString *str) {
+    FString *string = malloc(sizeof(FString));
+
+    string->length = str->length;
+    string->data = malloc(sizeof(u16) * (string->length + 1));
+    string->data = u16ncpy(string->data, str->data, string->length);
+    string->data[string->length] = '\0';
+
+
+    return string;
+}
+
+FString *CreateStringWithLength(const u16 *str, size_t len) {
+    FString *string = malloc(sizeof(FString));
 
     string->length = len;
     string->data = malloc(sizeof(u16) * (string->length + 1));
@@ -24,7 +36,7 @@ FString* CreateStringWithLength(const u16* str, size_t len) {
     return string;
 }
 
-void FreeString(FString* this) {
+void FreeString(FString *this) {
     if (this == NULL) {
         return;
     }
@@ -36,6 +48,10 @@ void FreeString(FString* this) {
 }
 
 size_t HashString(FString *string) {
+    if (string == NULL) {
+        return 0;
+    }
+
     size_t hash = 0;
 
     for (int i = 0; i < string->length; i++) {

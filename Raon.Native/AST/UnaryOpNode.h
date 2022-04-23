@@ -10,10 +10,10 @@ extern "C" {
 typedef struct UnaryOpNode {
     AST_REQUIRED
 
-    FBaseNode* expr;
+    FBaseNode *expr;
 } FUnaryOpNode;
 
-DLL_EXPORT FUnaryOpNode *CreateUnaryOpNode(FToken *token, FBaseNode *expr);
+DLL_EXPORT FUnaryOpNode *CreateUnaryOpNode(AST_REQUIRE_ARGS, FBaseNode *expr);
 DLL_EXPORT void FreeUnaryOpNode(FUnaryOpNode *node);
 
 #ifdef __cplusplus

@@ -1,6 +1,10 @@
 #include "Symbol.h"
 
 void FreeSymbol(FSymbol *symbol) {
+    if (symbol == NULL) {
+        return;
+    }
+
     switch (symbol->symbolType) {
     case SYMBOL_TYPE:
         FreeTypeSymbol(symbol);

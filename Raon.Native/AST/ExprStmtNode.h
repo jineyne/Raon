@@ -14,7 +14,7 @@ typedef struct {
     FBaseNode *expr;
 } FExprStmtNode;
 
-DLL_EXPORT FExprStmtNode *CreateExprStmtNode(FExprStmtNode *node);
+DLL_EXPORT FExprStmtNode *CreateExprStmtNode(AST_REQUIRE_ARGS, FBaseNode *node);
 DLL_EXPORT void FreeExprStmtNode(FExprStmtNode *node);
 
 #ifdef __cplusplus

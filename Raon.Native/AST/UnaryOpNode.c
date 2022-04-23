@@ -1,18 +1,18 @@
 #include "UnaryOpNode.h"
 
-FUnaryOpNode* CreateUnaryOpNode(FToken* token, FBaseNode* expr) {
-    FUnaryOpNode* node = malloc(sizeof(FUnaryOpNode));
-    node->type = AST_UNARYOP;
-    node->type = CombineHash(HashString(token->str), expr->hash);
+FUnaryOpNode *CreateUnaryOpNode(AST_REQUIRE_ARGS, FBaseNode *expr) {
+    FUnaryOpNode *node = malloc(sizeof(FUnaryOpNode));
+    INIT_BASE_NODE(node, AST_UNARYOP);
 
-    node->token = token;
+    node->type = CombineHash(HashString(token->str), expr->hash);
     node->expr = expr;
 
     return node;
 }
 
-void FreeUnaryOpNode(FUnaryOpNode* node) {
-    FreeNode(node->expr);
+void FreeUnaryOpNode(FUnaryOpNode *node) {
+    FinitBaseNode(node);
 
+    FreeNode(node->expr);
     free(node);
 }

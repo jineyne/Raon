@@ -18,6 +18,10 @@ FCompiler *CreateCompiler() {
 }
 
 void FreeCompiler(FCompiler *compiler) {
+    if (compiler == NULL) {
+        return;
+    }
+
     free(compiler);
 }
 
