@@ -34,6 +34,8 @@ FSymbolTable *CopySymbolTable(u16 *name, FSymbolTable *original) {
         Critical(ERROR_ALLOC_FAIL);
     }
 
+    table->currentSlot = 0;
+
     FSymbol *it;
     ARRAY_FOREACH(original->symbols, it) {
         switch (it->symbolType) {
@@ -134,7 +136,7 @@ int FindSymbolDeep(FSymbolTable *table, FString *name, FSymbol **out) {
     return ERROR_NONE;
 }
 
-bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src) {
+bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src, bool freeOldSymbol) {
     if (dst == NULL || src == NULL) {
         return false;
     }
@@ -152,7 +154,9 @@ bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src) {
             }
             dst->symbols[((int64_t) p - 1)] = it;
 
-            FreeSymbol(found);
+            if (freeOldSymbol) {
+                FreeSymbol(found);
+            }
         }
     }
 

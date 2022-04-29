@@ -30,7 +30,7 @@ DLL_EXPORT int InsertSymbol(FSymbolTable *table, FSymbol *symbol);
 DLL_EXPORT int FindSymbol(FSymbolTable *table, FString *name, FSymbol **out);
 DLL_EXPORT int FindSymbolDeep(FSymbolTable *table, FString *name, FSymbol **out);
 
-DLL_EXPORT bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src);
+DLL_EXPORT bool ApplyAndFreeSymbolTable(FSymbolTable *dst, FSymbolTable *src, bool freeOldSymbol);
 
 #ifdef __cplusplus
 }

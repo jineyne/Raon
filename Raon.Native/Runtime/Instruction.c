@@ -1,5 +1,7 @@
 ﻿#include "Instruction.h"
 
+#include "Utility/Error.h"
+
 #define FETCH() this->object->codes[this->pc++]
 #define MV(DST, SRC) memcpy(&DST, &SRC, sizeof(FValue))
 
@@ -9,12 +11,6 @@
     case M: SRC = this->memory[ADDR]; break; \
     case R: SRC = this->registers[ADDR]; break; \
     default: return false; \
-}
-
-static void checkMem(FVM *this, int64_t addr) {
-    while (ARRAY_SIZE(this->memory) <= addr) {
-        ARRAY_RESIZE(this->memory, 1 + ARRAY_CAPACITY(this->memory) * 2);
-    }
 }
 
 static bool nop(FVM *this, uint16_t type) {
@@ -36,25 +32,35 @@ static bool move(FVM *this, uint16_t type) {
     FValue *src = NULL;
 
     switch (type) {
+    case OPERAND(M, B, 0, 0):
+        this->memory[val1].type = VALUE_BOOL;
+        this->memory[val1].data = val2;
+        break;
+
     case OPERAND(M, L, 0, 0):
-        checkMem(this, val1);
         this->memory[val1].type = VALUE_INT;
         this->memory[val1].data = val2;
         break;
 
     case OPERAND(M, C, 0, 0):
-        checkMem(this, val1);
         MV(this->memory[val1], this->object->constants[val2]);
         break;
 
     case OPERAND(M, M, 0, 0):
-        checkMem(this, val1);
         MV(this->memory[val1], this->memory[val2]);
         break;
 
+    case OPERAND(M, S, 0, 0):
+        MV(this->memory[val1], this->stacks[val2]);
+        break;
+
     case OPERAND(M, R, 0, 0):
-        checkMem(this, val1);
         MV(this->memory[val1], this->registers[val2]);
+        break;
+
+    case OPERAND(R, B, 0, 0):
+        this->registers[val1].type = VALUE_BOOL;
+        this->registers[val1].data = val2;
         break;
 
     case OPERAND(R, L, 0, 0):
@@ -67,12 +73,41 @@ static bool move(FVM *this, uint16_t type) {
         break;
 
     case OPERAND(R, M, 0, 0):
-        checkMem(this, val2);
         MV(this->registers[val1], this->memory[val2]);
+        break;
+
+    case OPERAND(R, S, 0, 0):
+        MV(this->registers[val1], this->stacks[val2]);
         break;
 
     case OPERAND(R, R, 0, 0):
         MV(this->registers[val1], this->registers[val2]);
+        break;
+
+    case OPERAND(S, B, 0, 0):
+        this->stacks[val1].type = VALUE_BOOL;
+        this->stacks[val1].data = val2;
+        break;
+
+    case OPERAND(S, L, 0, 0):
+        this->stacks[val1].type = VALUE_INT;
+        this->stacks[val1].data = val2;
+        break;
+
+    case OPERAND(S, C, 0, 0):
+        MV(this->stacks[val1], this->object->constants[val2]);
+        break;
+
+    case OPERAND(S, M, 0, 0):
+        MV(this->stacks[val1], this->memory[val2]);
+        break;
+
+    case OPERAND(S, S, 0, 0):
+        MV(this->stacks[val1], this->stacks[val2]);
+        break;
+
+    case OPERAND(S, R, 0, 0):
+        MV(this->stacks[val1], this->registers[val2]);
         break;
 
     default:
@@ -89,23 +124,19 @@ static bool add(FVM *this, uint16_t type) {
 
     FValue *dst = NULL;
     switch (GET_OP1(type)) {
-    case M:
-        checkMem(this, dstOp);
-        dst = &this->memory[dstOp];
-        break;
-
     case R:
         dst = &this->registers[dstOp];
         break;
 
     default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
         return false;
     }
 
-    FValue src1 = { VALUE_NONE, 0 };
+    FValue src1 = {VALUE_NONE, 0};
     GET_OP(2, src1, val1);
 
-    FValue src2 = { VALUE_NONE, 0 };
+    FValue src2 = {VALUE_NONE, 0};
     GET_OP(3, src2, val2);
 
     if (src1.type == src2.type) {
@@ -115,7 +146,7 @@ static bool add(FVM *this, uint16_t type) {
             dst->data = src1.data + src2.data;
             break;
 
-        case VALUE_DOUBLE:
+        case VALUE_REAL:
             dst->data = (int64_t) ((double) src1.data + (double) src2.data);
             break;
 
@@ -134,23 +165,19 @@ static bool sub(FVM *this, uint16_t type) {
 
     FValue *dst = NULL;
     switch (GET_OP1(type)) {
-    case M:
-        checkMem(this, dstOp);
-        dst = &this->memory[dstOp];
-        break;
-
     case R:
         dst = &this->registers[dstOp];
         break;
 
     default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
         return false;
     }
 
-    FValue src1 = { VALUE_NONE, 0 };
+    FValue src1 = {VALUE_NONE, 0};
     GET_OP(2, src1, val1);
 
-    FValue src2 = { VALUE_NONE, 0 };
+    FValue src2 = {VALUE_NONE, 0};
     GET_OP(3, src2, val2);
 
     if (src1.type == src2.type) {
@@ -160,7 +187,7 @@ static bool sub(FVM *this, uint16_t type) {
             dst->data = src1.data - src2.data;
             break;
 
-        case VALUE_DOUBLE:
+        case VALUE_REAL:
             dst->data = (int64_t) ((double) src1.data - (double) src2.data);
             break;
 
@@ -179,23 +206,19 @@ static bool mul(FVM *this, uint16_t type) {
 
     FValue *dst = NULL;
     switch (GET_OP1(type)) {
-    case M:
-        checkMem(this, dstOp);
-        dst = &this->memory[dstOp];
-        break;
-
     case R:
         dst = &this->registers[dstOp];
         break;
 
     default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
         return false;
     }
 
-    FValue src1 = { VALUE_NONE, 0 };
+    FValue src1 = {VALUE_NONE, 0};
     GET_OP(2, src1, val1);
 
-    FValue src2 = { VALUE_NONE, 0 };
+    FValue src2 = {VALUE_NONE, 0};
     GET_OP(3, src2, val2);
 
     if (src1.type == src2.type) {
@@ -205,7 +228,7 @@ static bool mul(FVM *this, uint16_t type) {
             dst->data = src1.data * src2.data;
             break;
 
-        case VALUE_DOUBLE:
+        case VALUE_REAL:
             dst->data = (int64_t) ((double) src1.data * (double) src2.data);
             break;
 
@@ -224,23 +247,19 @@ static bool _div(FVM *this, uint16_t type) {
 
     FValue *dst = NULL;
     switch (GET_OP1(type)) {
-    case M:
-        checkMem(this, dstOp);
-        dst = &this->memory[dstOp];
-        break;
-
     case R:
         dst = &this->registers[dstOp];
         break;
 
     default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
         return false;
     }
 
-    FValue src1 = { VALUE_NONE, 0 };
+    FValue src1 = {VALUE_NONE, 0};
     GET_OP(2, src1, val1);
 
-    FValue src2 = { VALUE_NONE, 0 };
+    FValue src2 = {VALUE_NONE, 0};
     GET_OP(3, src2, val2);
 
     if (src1.type == src2.type) {
@@ -250,28 +269,30 @@ static bool _div(FVM *this, uint16_t type) {
             dst->data = src1.data / src2.data;
             break;
 
-        case VALUE_DOUBLE:
+        case VALUE_REAL:
             dst->data = (int64_t) ((double) src1.data / (double) src2.data);
             break;
 
         default:
             return false;
         }
+    } else {
+        Critical(ERROR_CASTING_FAIL);
     }
 
     return true;
 }
 
 FOp ops[] = {
-    { 0, U16("nop"), nop },
+    {0, U16("nop"), nop},
 
-    { 0, U16("halt"), halt },
-    { 0, U16("ret"), ret },
+    {0, U16("halt"), halt},
+    {0, U16("ret"), ret},
 
-    { 2, U16("move"), move },
+    {2, U16("move"), move},
 
-    { 3, U16("add"), add },
-    { 3, U16("sub"), sub },
-    { 3, U16("mul"), mul },
-    { 3, U16("div"), _div },
+    {3, U16("add"), add},
+    {3, U16("sub"), sub},
+    {3, U16("mul"), mul},
+    {3, U16("div"), _div},
 };

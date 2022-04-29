@@ -4,13 +4,12 @@
 #include "FrontEnd/SyntaxAnalyzer.h"
 #include "BackEnd/Compiler.h"
 #include "Runtime/VM.h"
-#include "IL/FILAssembler.h"
+#include "IL/ILAssembler.h"
+#include "Utility/Converter.h"
 #include "Utility/Error.h"
 
 TEST(VMTest, Global) {
-    SetLocale(LOCALE_KO);
-    ClearError();
-
+    InitRaon();
 
     FParser *parser = nullptr;
     FBaseNode *node = nullptr;
@@ -80,6 +79,44 @@ TEST(VMTest, Interpret) {
 
     ExecuteSource(vm, U16("b = a * 10;"));
     EXPECT_EQ(GetErrorCount(), 1);
+
+    FreeVM(vm);
+}
+
+bool almosteq(double a, double b) {
+    return (fabs(a - b) < (DBL_EPSILON * fabs(a + b)));
+}
+
+TEST(VMTest, ValueAssignTest) {
+    FVM *vm = CreateVM();
+
+    ExecuteSource(vm, U16("a = 10 * 6 - 7 * 13"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_INT);
+    EXPECT_EQ(vm->memory[0].data, -31);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = 10.1"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_REAL);
+
+    FConverter16 cvts;
+    cvts.integer = vm->memory[0].data;
+
+    EXPECT_TRUE(almosteq(cvts.real, 10.1));
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = true"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, true);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = false"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, false);
+    wprintf(L"\n");
 
     FreeVM(vm);
 }

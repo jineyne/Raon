@@ -5,8 +5,7 @@
 #include "Utility/Error.h"
 
 TEST(SyntaxAnalyzerTest, RunSyntaxAnalyzer) {
-    SetLocale(LOCALE_KO);
-    ClearError();
+    InitRaon();
 
     FParser *parser = nullptr;
     FSyntaxAnalyzer *analyzer = nullptr;

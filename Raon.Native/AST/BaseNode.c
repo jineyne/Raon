@@ -4,6 +4,7 @@
 #include "CompoundNode.h"
 #include "EmptyNode.h"
 #include "BinOpNode.h"
+#include "BoolNode.h"
 #include "ExprStmtNode.h"
 #include "UnaryOpNode.h"
 #include "IntegerNode.h"
@@ -16,8 +17,6 @@ void InitBaseNode(FBaseNode *node, EASTType type, AST_REQUIRE_ARGS) {
     node->location = CreateLocation(source, token);
     if (node->location->token->str != NULL) {
         node->hash = HashString(node->location->token->str);
-    } else if (node->location->token->op != NULL) {
-        node->hash = HashString(node->location->token->op);
     } else {
         node->hash = 0;
     }
@@ -51,11 +50,17 @@ void FreeNode(FBaseNode *node) {
     case AST_UNARYOP:
         FreeUnaryOpNode(node);
         break;
+    case AST_BOOL:
+        FreeBoolNode(node);
+        break;
     case AST_INTEGER:
         FreeIntegerNode(node);
         break;
     case AST_REAL:
         FreeRealNode(node);
+        break;
+    case AST_STRING:
+        FreeStringNode(node);
         break;
     case AST_VAR:
         FreeVarNode(node);

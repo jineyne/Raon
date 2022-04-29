@@ -125,6 +125,14 @@ FSyntaxAnalyzerResult visitCompoundNode(FSyntaxAnalyzer *this, FCompoundNode *no
     END;
 }
 
+FSyntaxAnalyzerResult visitBoolNode(FSyntaxAnalyzer *this, FBoolNode *node) {
+    BEGIN;
+
+    RVALUE;
+
+    END;
+}
+
 FSyntaxAnalyzerResult visitIntegerNode(FSyntaxAnalyzer *this, FIntegerNode *node) {
     BEGIN;
 
@@ -151,6 +159,9 @@ FSyntaxAnalyzerResult visitStringNode(FSyntaxAnalyzer *this, FStringNode *node) 
 
 FSyntaxAnalyzerResult visitUnaryOpNode(FSyntaxAnalyzer *this, FUnaryOpNode *node) {
     BEGIN;
+
+    this->limit = RValue;
+    VISIT_GRAP(right, node->expr)
 
     END;
 }

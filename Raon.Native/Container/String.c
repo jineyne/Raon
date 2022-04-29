@@ -1,6 +1,10 @@
 ﻿#include "String.h"
 
 FString *CreateString(const u16 *str) {
+    if (str == NULL) {
+        return NULL;
+    }
+
     FString *string = malloc(sizeof(FString));
 
     string->length = u16len(str);
@@ -13,6 +17,10 @@ FString *CreateString(const u16 *str) {
 }
 
 FString *CopyString(const FString *str) {
+    if (str == NULL) {
+        return NULL;
+    }
+
     FString *string = malloc(sizeof(FString));
 
     string->length = str->length;
@@ -25,6 +33,10 @@ FString *CopyString(const FString *str) {
 }
 
 FString *CreateStringWithLength(const u16 *str, size_t len) {
+    if (str == NULL || len == 0) {
+        return NULL;
+    }
+
     FString *string = malloc(sizeof(FString));
 
     string->length = len;

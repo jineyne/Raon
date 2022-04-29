@@ -31,6 +31,7 @@ typedef enum ASTType {
 
     // RVALUE
 
+    AST_BOOL,
     AST_INTEGER,
     AST_REAL,
     AST_STRING,

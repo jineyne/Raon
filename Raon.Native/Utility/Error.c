@@ -21,6 +21,9 @@ static FErrorStringDesc gLocale[LOCALE_COUNT] = {
         U16("메모리 할당에 실패하였습니다."),
         U16("스택 오버플로우."),
         U16("스택 언더플로우."),
+
+        U16("지원하지 않는 명령어입니다."),
+        U16("타입 변환에 실패하였습니다."),
     }
 };
 
@@ -63,25 +66,39 @@ static const u16 *levelColors[] = {
     U16("\x1b[94m"), U16("\x1b[36m"), U16("\x1b[32m"), U16("\x1b[33m"), U16("\x1b[31m"), U16("\x1b[35m")
 };
 
+static LoggerDelegate *gMsgLogger = NULL;
+
+void print(u16 *buffer) {
+    LoggerDelegate it;
+    ARRAY_FOREACH(gMsgLogger, it) {
+        it(buffer);
+    }
+}
+
 void printCompileLogPrefix(ELogLevel level, u16 *file, size_t line, size_t pos) {
-    u16 buf[16];
+    u16 timeBuf[16];
     time_t t = time(NULL);
     struct tm tm;
     localtime_s(&tm, &t);
+    timeBuf[wcsftime(timeBuf, sizeof(timeBuf), U16("%H:%M:%S"), &tm)] = U16('\0');
 
-    buf[wcsftime(buf, sizeof(buf), U16("%H:%M:%S"), &tm)] = U16('\0');
-    wprintf(U16("%s %s%-5s\x1b[0m \x1b[90m%s:(%lld, %lld):\x1b[0m "),
-            buf, levelColors[level], levelStrings[level], file, line, pos);
+    u16 buffer[BUFFER_COUNT];
+    swprintf(buffer, BUFFER_COUNT, U16("%s %s%-5s\x1b[0m \x1b[90m%s:(%lld, %lld):\x1b[0m "), timeBuf,
+             levelColors[level], levelStrings[level], file, line, pos);
+    print(buffer);
 }
 
 void printeLogPrefix(ELogLevel level) {
-    u16 buf[16];
+    u16 timeBuf[16];
     time_t t = time(NULL);
     struct tm tm;
     localtime_s(&tm, &t);
 
-    buf[wcsftime(buf, sizeof(buf), U16("%H:%M:%S"), &tm)] = U16('\0');
-    wprintf(U16("%s %s%-5s):\x1b[0m "), buf, levelColors[level], levelStrings[level]);
+    timeBuf[wcsftime(timeBuf, sizeof(timeBuf), U16("%H:%M:%S"), &tm)] = U16('\0');
+
+    u16 buffer[BUFFER_COUNT];
+    swprintf(buffer, BUFFER_COUNT, U16("%s %s%-5s):\x1b[0m "), timeBuf, levelColors[level], levelStrings[level]);
+    print(buffer);
 }
 
 void CompileInfo(int type, u16 *file, size_t line, size_t pos, ...) {
@@ -96,7 +113,7 @@ void CompileInfo(int type, u16 *file, size_t line, size_t pos, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -113,7 +130,7 @@ void CompileWarning(int type, u16 *file, size_t line, size_t pos, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -130,7 +147,7 @@ void CompileError(int type, u16 *file, size_t line, size_t pos, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -147,7 +164,7 @@ void Info(int type, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -164,7 +181,7 @@ void Warning(int type, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -181,7 +198,7 @@ void Error(int type, ...) {
     vswprintf(buffer, BUFFER_COUNT, GetErrorString(type), varg);
     buffer[u16len(buffer)] = '\n';
 
-    wprintf(buffer);
+    print(buffer);
 
     va_end(varg);
 }
@@ -232,4 +249,8 @@ u16 *GetErrorString(int type) {
     default:
         return U16("");
     }
+}
+
+void AddLogger(LoggerDelegate fn) {
+    ARRAY_PUSH(gMsgLogger, fn);
 }

@@ -5,6 +5,7 @@
 
 #include "AssignOp.h"
 #include "BinOp.h"
+#include "Bool.h"
 #include "Compound.h"
 #include "ExprStmt.h"
 #include "Int.h"
@@ -14,6 +15,7 @@
 #include "Var.h"
 
 #include "ILMacros.h"
+#include "UnaryOp.h"
 #include "Utility/Error.h"
 
 typedef enum {
@@ -141,9 +143,9 @@ FILAssemblerVisitResult visitBinOpNode(FILAssembler *this, FBinOpNode *node) {
     PHASE_END
 
     SEARCH_PHASE
+        AddEdgeToGraph(this->graph, node->left, node->right);
         AddEdgeToGraph(this->graph, (FBaseNode*) node, node->left);
         AddEdgeToGraph(this->graph, (FBaseNode*) node, node->right);
-        AddEdgeToGraph(this->graph, node->left, node->right);
     PHASE_END
 
     END;
@@ -170,6 +172,20 @@ FILAssemblerVisitResult visitCompoundNode(FILAssembler *this, FCompoundNode *nod
 
     IL = CreateCompound(this->statements);
     this->statements = temp;
+
+    END;
+}
+
+FILAssemblerVisitResult visitBoolNode(FILAssembler *this, FBoolNode *node) {
+    BEGIN;
+
+    GENERATION_PHASE
+        IL = CreateBool(node->value);
+        IL->operand = GetColorFromGraph(this->graph, node);
+    PHASE_END
+
+    SEARCH_PHASE
+    PHASE_END
 
     END;
 }
@@ -223,12 +239,12 @@ FILAssemblerVisitResult visitUnaryOpNode(FILAssembler *this, FUnaryOpNode *node)
     EXPR(expr, node->expr);
 
     GENERATION_PHASE
-        /*EOperation op = tokenToOp(node->location->token);
+        EOperation op = tokenToOp(node->location->token);
         if (op == OPERATION_UNKNOWN) {
             FAILED;
         } else {
-            IL = CreateBinOp(op, left.il, right.il);
-        }*/
+            IL = CreateUnaryOp(op, expr.il);
+        }
     PHASE_END
 
     SEARCH_PHASE
@@ -246,10 +262,12 @@ FILAssemblerVisitResult visitVarNode(FILAssembler *this, FVarNode *node) {
         FSymbol *symbol = NULL;
         if (FindSymbol(this->local, node->location->token->str, &symbol) == ERROR_NONE) {
             addr = symbol->slot;
-        }
 
-        IL = CreateVar(node->location->token->str, addr);
-        IL->operand = GetColorFromGraph(this->graph, node);
+            IL = CreateVar(node->location->token->str, addr);
+            IL->operand = GetColorFromGraph(this->graph, node);
+        } else {
+            Critical(ERROR_INVALID_IDENTIFIER, node->location->token->str);
+        }
     PHASE_END
 
     SEARCH_PHASE

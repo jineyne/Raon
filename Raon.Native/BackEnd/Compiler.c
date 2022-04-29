@@ -70,8 +70,12 @@ DEFINE_ILVISITER(FCompilerVisitResult, FCompiler *);
 
 void printOp(EOperand op, int64_t value) {
     switch (op) {
+    case B:
+        (bool) value ? wprintf(U16("true")) : wprintf(U16("false"));
+        break;
+
     case L:
-        wprintf(U16("&%lld"), value);
+        wprintf(U16("%lld"), value);
         break;
 
     case C:
@@ -83,7 +87,7 @@ void printOp(EOperand op, int64_t value) {
         break;
 
     case M:
-        wprintf(U16("#%lld"), value);
+        wprintf(U16("&%lld"), value);
         break;
 
     default:
@@ -133,21 +137,11 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
     FCompilerVisitResult left = {false, 0, NULL};
     FCompilerVisitResult right = {false, 0, NULL};
 
-    if (TO(FBinOp)->left->type == IL_INTEGER) {
-        left.type = L;
-        left.result = ((FInt *) TO(FBinOp)->left)->value;
-    } else {
-        LPHASE;
-        VISIT_GRAP_ND(left, TO(FBinOp)->left);
-    }
+    RPHASE;
+    VISIT_GRAP_ND(right, TO(FBinOp)->right);
 
-    if (TO(FBinOp)->right->type == IL_INTEGER) {
-        right.type = L;
-        right.result = ((FInt *) TO(FBinOp)->right)->value;
-    } else {
-        RPHASE;
-        VISIT_GRAP_ND(right, TO(FBinOp)->right);
-    }
+    LPHASE;
+    VISIT_GRAP_ND(left, TO(FBinOp)->left);
 
     int opcode = 0;
     switch (TO(FBinOp)->op) {
@@ -211,16 +205,36 @@ FCompilerVisitResult visitVar(FCompiler *this, FVar *il) {
     END;
 }
 
-FCompilerVisitResult visitInt(FCompiler *this, FInt *il) {
+FCompilerVisitResult visitBool(FCompiler *this, FBool *il) {
     BEGIN;
 
-    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, L, 0, 0));
+    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, B, 0, 0));
+    ARRAY_PUSH(CODES, il->operand);
     ARRAY_PUSH(CODES, il->value);
 
     PRINT(U16("MOVE "));
     PRINT_OP(R, il->operand);
     PRINT_COMMA()
-    PRINT_OP(L, il->operand);
+    PRINT_OP(B, il->value);
+    PRINT_LN();
+
+    TYPE = R;
+    RESULT = il->operand;
+
+    END;
+}
+
+FCompilerVisitResult visitInt(FCompiler *this, FInt *il) {
+    BEGIN;
+
+    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, L, 0, 0));
+    ARRAY_PUSH(CODES, il->operand);
+    ARRAY_PUSH(CODES, il->value);
+
+    PRINT(U16("MOVE "));
+    PRINT_OP(R, il->operand);
+    PRINT_COMMA()
+    PRINT_OP(L, il->value);
     PRINT_LN();
 
     TYPE = R;
@@ -234,6 +248,7 @@ FCompilerVisitResult visitReal(FCompiler *this, FReal *il) {
 
     ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, C, 0, 0));
     int64_t addr = AppendDoubleConstant(this->object, il->value);
+    ARRAY_PUSH(CODES, il->operand);
     ARRAY_PUSH(CODES, addr);
 
     PRINT(U16("MOVE "));

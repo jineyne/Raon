@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Syntastics\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Raon.Core\Raon.Core.csproj" />
   </ItemGroup>
 

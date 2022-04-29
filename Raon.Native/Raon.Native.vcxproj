@@ -146,6 +146,7 @@
     <ClInclude Include="AST\ASTCPP.h" />
     <ClInclude Include="AST\ASTMacros.h" />
     <ClInclude Include="AST\BaseNode.h" />
+    <ClInclude Include="AST\BoolNode.h" />
     <ClInclude Include="AST\ExprStmtNode.h" />
     <ClInclude Include="AST\IntegerNode.h" />
     <ClInclude Include="AST\BinOpNode.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="BackEnd\CompilerObject.h" />
     <ClInclude Include="BackEnd\BackEndDefines.h" />
     <ClInclude Include="Container\HashMap.h" />
+    <ClInclude Include="FrontEnd\Keyword.h" />
     <ClInclude Include="FrontEnd\Lexer.h" />
     <ClInclude Include="FrontEnd\Parser.h" />
     <ClInclude Include="FrontEnd\Token.h" />
@@ -165,6 +167,7 @@
     <ClInclude Include="AST\StringNode.h" />
     <ClInclude Include="IL\AssignOp.h" />
     <ClInclude Include="IL\BinOp.h" />
+    <ClInclude Include="IL\Bool.h" />
     <ClInclude Include="IL\Compound.h" />
     <ClInclude Include="IL\Expr.h" />
     <ClInclude Include="IL\ExprStmt.h" />
@@ -178,6 +181,7 @@
     <ClInclude Include="IL\Real.h" />
     <ClInclude Include="IL\Stmt.h" />
     <ClInclude Include="IL\Str.h" />
+    <ClInclude Include="IL\UnaryOp.h" />
     <ClInclude Include="IL\Var.h" />
     <ClInclude Include="Runtime\Instruction.h" />
     <ClInclude Include="Utility\Locale.h" />
@@ -212,6 +216,7 @@
   <ItemGroup>
     <ClCompile Include="AST\AssignOpNode.c" />
     <ClCompile Include="AST\BaseNode.c" />
+    <ClCompile Include="AST\BoolNode.c" />
     <ClCompile Include="AST\ExprStmtNode.c" />
     <ClCompile Include="AST\IntegerNode.c" />
     <ClCompile Include="AST\BinOpNode.c" />
@@ -232,6 +237,7 @@
     <ClCompile Include="AST\StringNode.c" />
     <ClCompile Include="IL\AssignOp.c" />
     <ClCompile Include="IL\BinOp.c" />
+    <ClCompile Include="IL\Bool.c" />
     <ClCompile Include="IL\Compound.c" />
     <ClCompile Include="IL\Expr.c" />
     <ClCompile Include="IL\ExprStmt.c" />
@@ -243,6 +249,7 @@
     <ClCompile Include="IL\Real.c" />
     <ClCompile Include="IL\Stmt.c" />
     <ClCompile Include="IL\Str.c" />
+    <ClCompile Include="IL\UnaryOp.c" />
     <ClCompile Include="IL\Var.c" />
     <ClCompile Include="Runtime\Instruction.c" />
     <ClCompile Include="Utility\Locale.c" />

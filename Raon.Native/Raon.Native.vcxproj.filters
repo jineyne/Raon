@@ -216,6 +216,18 @@
     <ClInclude Include="Utility\Locale.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="AST\BoolNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FrontEnd\Keyword.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IL\Bool.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IL\UnaryOp.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Container\Array.c">
@@ -372,6 +384,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Utility\Locale.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AST\BoolNode.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IL\Bool.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IL\UnaryOp.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

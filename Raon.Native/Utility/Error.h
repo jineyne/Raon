@@ -25,6 +25,9 @@ typedef struct {
 
     u16 *stackOverflow;
     u16 *stackUnderflow;
+
+    u16 *operandNotSupport;
+    u16 *castingFailed;
 } FErrorStringDesc;
 
 enum {
@@ -48,6 +51,10 @@ enum {
     ERROR_STACK_OVERFLOW,
     ERROR_STACK_UNDERFLOW,
 
+
+    ERROR_OPERAND_NOT_SUPPORT,
+    ERROR_CASTING_FAIL,
+
     ERROR_UNKNOWN,
 };
 
@@ -65,6 +72,9 @@ DLL_EXPORT void Error(int type, ...);
 DLL_EXPORT void Critical(int type, ...);
 
 DLL_EXPORT u16 *GetErrorString(int type);
+
+typedef void (*LoggerDelegate)(u16 *buffer);
+DLL_EXPORT void AddLogger(LoggerDelegate fn);
 
 #ifdef __cplusplus
 }

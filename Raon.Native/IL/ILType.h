@@ -14,9 +14,11 @@ typedef enum {
 
     IL_ASSIGNOP,
     IL_BINOP,
+    IL_UNARYOP,
 
     IL_VAR,
 
+    IL_BOOL,
     IL_INTEGER,
     IL_REAL,
     IL_STRING,

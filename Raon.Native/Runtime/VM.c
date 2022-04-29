@@ -12,8 +12,11 @@ FVM *CreateVM() {
 
     vm->object = NULL;
 
-    vm->stacks = NULL;
-    vm->memory = NULL;
+    /*vm->stacks = NULL;
+    vm->memory = NULL;*/
+
+    memset(vm->stacks, 0, sizeof(vm->stacks));
+    memset(vm->memory, 0, sizeof(vm->memory));
 
     vm->running = false;
     for (int i = 0; i < 16; i++) {
@@ -22,6 +25,7 @@ FVM *CreateVM() {
     }
     vm->global = CreateSymbolTable(U16("VM"), NULL);
 
+    vm->zf = false;
     memset(vm->registers, 0, sizeof(vm->registers));
 
     return vm;
@@ -30,8 +34,8 @@ FVM *CreateVM() {
 void FreeVM(FVM *vm) {
     // ARRAY_FREE(vm->object);
 
-    ARRAY_FREE(vm->memory);
-    STACK_FREE(vm->stacks);
+    /*ARRAY_FREE(vm->memory);
+    STACK_FREE(vm->stacks);*/
 }
 
 extern FOp ops[];
@@ -61,8 +65,6 @@ void Execute(FVM *this, FCompilerObject *object) {
 }
 
 void ExecuteSource(FVM *vm, u16 *str) {
-    SetLocale(LOCALE_KO);
-
     ClearError();
 
     FParser *parser = CreateParserFromMemory(str);
@@ -77,7 +79,7 @@ void ExecuteSource(FVM *vm, u16 *str) {
         goto finit1;
     }
 
-    ApplyAndFreeSymbolTable(vm->global, analyzer->symtab);
+    ApplyAndFreeSymbolTable(vm->global, analyzer->symtab, false);
     FILAssembler *assembler = CreateILAssembler();
     assembler->local = vm->global;
 
@@ -115,4 +117,42 @@ finit0:
 
 void InterpretLine(FVM *vm, FString *line) {
     ExecuteSource(vm, line->data);
+}
+
+bool TryGetBoolValueByName(FVM *vm, u16 *name, bool *out) {
+    FString str = {name, u16len(name)};
+    FSymbol *symbol = NULL;
+
+    *out = false;
+
+    if (FindSymbol(vm, &str, &symbol) != ERROR_NONE) {
+        return false;
+    }
+
+    if (symbol == NULL) {
+        return false;
+    }
+
+    if (symbol->slot < 0) {
+        return false;
+    }
+
+    if (vm->memory[symbol->slot].type != VALUE_BOOL) {
+        return false;
+    }
+
+    *out = vm->memory[symbol->slot].data;
+    return true;
+}
+
+bool TryGetIntegerValueByName(FVM *vm, u16 *name, int *out) {
+    return false;
+}
+
+bool TryGetRealValueByName(FVM *vm, u16 *name, double *out) {
+    return false;
+}
+
+bool TryGetStringValueByName(FVM *vm, u16 *name, u16 **out) {
+    return false;
 }

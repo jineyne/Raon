@@ -11,9 +11,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raon.Native", "Raon.Native\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{BE1B6978-5B3C-4A5C-A1F8-C665408783F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raon.Core.Tests", "Tests\Raon.Core.Tests\Raon.Core.Tests.csproj", "{0E88FA37-D63C-4279-AF24-A95E2487707E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raon.Core.Tests", "Tests\Raon.Core.Tests\Raon.Core.Tests.csproj", "{0E88FA37-D63C-4279-AF24-A95E2487707E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raon.Native.Tests", "Raon.Native.Tests\Raon.Native.Tests.vcxproj", "{C868DB57-E532-4D43-9AC6-D2934AC7687C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raon.Core.Console.Tests", "Raon.Core.Console.Tests\Raon.Core.Console.Tests.csproj", "{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +87,18 @@ Global
 		{C868DB57-E532-4D43-9AC6-D2934AC7687C}.Release|x64.Build.0 = Release|x64
 		{C868DB57-E532-4D43-9AC6-D2934AC7687C}.Release|x86.ActiveCfg = Release|Win32
 		{C868DB57-E532-4D43-9AC6-D2934AC7687C}.Release|x86.Build.0 = Release|Win32
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|x64.Build.0 = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Debug|x86.Build.0 = Debug|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|x64.ActiveCfg = Release|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|x64.Build.0 = Release|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|x86.ActiveCfg = Release|Any CPU
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +106,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0E88FA37-D63C-4279-AF24-A95E2487707E} = {BE1B6978-5B3C-4A5C-A1F8-C665408783F0}
 		{C868DB57-E532-4D43-9AC6-D2934AC7687C} = {BE1B6978-5B3C-4A5C-A1F8-C665408783F0}
+		{BF5AA093-CB4F-46AB-8A4D-EAD969D6D23E} = {BE1B6978-5B3C-4A5C-A1F8-C665408783F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B910FE1B-A6B4-4D21-9A1E-C025BD6D01F7}

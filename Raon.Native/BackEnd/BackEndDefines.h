@@ -7,24 +7,14 @@
 extern "C" {
 #endif
 
-// this file contains the code for all operations, when each operation
-// is called the state of the cpu, the ram arr, and the operand type is
-// passed in. the 16 bit operand type is a bit field representing what
-// types of the operands the instruction is called with.
-//
-// TYPE BIT FIELD 
-//  _______________ _______________ _______________ _______________     
-// |               |               |               |               |
-// | 0 | R | M | L | 0 | R | M | L | 0 | R | M | L | 0 | R | M | L |
-// |_______________|_______________|_______________|_______________|
-//     operand 1       operand 2       operand 3       operand 4
-//
+
+// L = literal   - this means we want to use the operand literally -> val
+// L = literal   - this means we want to use the operand literally -> val
 // L = literal   - this means we want to use the operand literally -> val
 // C = Constant  - this means we want to access constant at the operand -> constant[val]
-// M = memory    - this means we want to access ram at the operand -> memory[val]
+// M = memory    - this means we want to access memory at the operand -> memory[val]
+// S = stack     - this means we want to access stack at the operand -> stack[val]
 // R = reference - this means we want to register -> registers[ind]
-//
-// to convert the constants L, M, R to this format the OPERAND macro is used
 #define OPERAND(o1, o2, o3, o4) ((o4 << 12) | (o3 << 8) | (o2 << 4) | o1)
 
 #define GET_OP1(VAL) (VAL & 0xF)
@@ -33,24 +23,41 @@ extern "C" {
 #define GET_OP4(VAL) (VAL >> 12) & 0xF
 
 typedef enum {
-    L = 0x1, // Literal
-    C = 0x2, // Constants
-    M = 0x3, // Memory
-    R = 0x4, // Register
+    // Byte (Bool, Byte)
+    B = 0x1,
+    // Int
+    L = 0x2,
+    // Constants
+    C = 0x3,
+
+    // Memory
+    M = 0x4,
+    // Stack
+    S = 0x5,
+    // Register
+    R = 0x6,
 } EOperand;
 
 typedef enum {
-    OP_NONE,    // NOTHING
+    // NOTHING
+    OP_NONE,
 
-    OP_HALT,    // STOP PROGRAM,
-    OP_RET,     // POP VALUE FROM THE TOP OF THE STACK
+    // STOP PROGRAM,
+    OP_HALT,
+    // POP VALUE FROM THE TOP OF THE STACK
+    OP_RET,
 
-    OP_MOVE,    // MOVE a b => b -> a
+    // MOVE a b => b -> a
+    OP_MOVE,
 
-    OP_ADD,     // ADD r0 r1 r2 => r0 = r1 + r2
-    OP_SUB,     // SUB r0 r1 r2 => r0 = r1 - r2
-    OP_MUL,     // MUL r0 r1 r2 => r0 = r1 * r2
-    OP_DIV,     // DIV r0 r1 r2 => r0 = r1 / r2
+    // ADD r0 r1 r2 => r0 = r1 + r2
+    OP_ADD,
+    // SUB r0 r1 r2 => r0 = r1 - r2
+    OP_SUB,
+    // MUL r0 r1 r2 => r0 = r1 * r2
+    OP_MUL,
+    // DIV r0 r1 r2 => r0 = r1 / r2
+    OP_DIV,
 } EOpCode;
 
 #ifdef __cplusplus

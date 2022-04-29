@@ -3,12 +3,11 @@
 #include "FrontEnd/Parser.h"
 #include "FrontEnd/SyntaxAnalyzer.h"
 #include "BackEnd/Compiler.h"
-#include "IL/FILAssembler.h"
+#include "IL/ILAssembler.h"
 #include "Utility/Error.h"
 
 TEST(CompilerTest, Global) {
-    SetLocale(LOCALE_KO);
-    ClearError();
+    InitRaon();
 
     FParser *parser = nullptr;
     FBaseNode *node = nullptr;

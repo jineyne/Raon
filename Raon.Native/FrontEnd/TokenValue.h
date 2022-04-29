@@ -7,10 +7,11 @@
 extern "C" {
 #endif
 
-    typedef union TokenValue {
-        int64_t integer;
-        double real;
-    } UTokenValue;
+typedef union TokenValue {
+    bool boolean;
+    int64_t integer;
+    double real;
+} UTokenValue;
 
 #ifdef __cplusplus
 }

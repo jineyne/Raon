@@ -10,8 +10,9 @@ extern "C" {
 typedef enum {
     VALUE_NONE,
 
+    VALUE_BOOL,
     VALUE_INT,
-    VALUE_DOUBLE,
+    VALUE_REAL,
     VALUE_STRING,
 } EValueType;
 

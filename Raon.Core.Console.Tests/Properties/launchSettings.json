@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Raon.Core.Console.Tests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

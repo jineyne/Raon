@@ -7,6 +7,7 @@
 #include "ExprStmtNode.h"
 #include "ExprStmtNode.h"
 #include "BinOpNode.h"
+#include "BoolNode.h"
 #include "IntegerNode.h"
 #include "RealNode.h"
 #include "StringNode.h"

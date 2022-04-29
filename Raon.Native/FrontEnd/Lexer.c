@@ -3,6 +3,8 @@
 #include "Container/FStringBuffer.h"
 #include "String/UTF16.h"
 
+#include "Keyword.h"
+
 FLexer *CreateLexer(const u16 *source) {
     if (source == NULL) {
         return NULL;
@@ -75,16 +77,21 @@ static FToken *number(FLexer *lexer) {
     }
 
     // REAL!
-    double decimal = 0;
+    double decimal = 1;
     advance(lexer);
+    AppendCString(sb, U16("."));
     while (lexer->currentChar != EmptyString && u16isdigit(lexer->currentChar)) {
-        decimal = decimal * 0.1 + (lexer->currentChar - U16('0'));
+        AppendChar(sb, lexer->currentChar);
+
+        decimal /= 10.f;
+
+        integer = integer * 10 + (lexer->currentChar - U16('0'));
         advance(lexer);
     }
 
     FString *str = StringBufferToString(sb);
     FreeStringBuffer(sb);
-    return CreateTokenFromReal(lexer->line, lexer->pos, str, (double) integer + decimal);
+    return CreateTokenFromReal(lexer->line, lexer->pos, str, (double) integer * decimal);
 }
 
 static FToken *string(FLexer *lexer) {
@@ -106,6 +113,11 @@ static FToken *string(FLexer *lexer) {
 
 }
 
+FKeyword keywords[] = {
+    {U16("true"), TOKEN_BOOL, true},
+    {U16("false"), TOKEN_BOOL, false},
+};
+
 static FToken *identifier(FLexer *lexer) {
     FStringBuffer *sb = CreateStringBuffer();
     u16 temp[2] = {0,};
@@ -118,15 +130,18 @@ static FToken *identifier(FLexer *lexer) {
 
     FString *str = StringBufferToString(sb);
 
-    /*for (uint32_t i = 0; i < sizeof(keywords) / sizeof(Keyword); i++) {
-        Keyword keyword = keywords[i];
-        if (u16cmp(keyword.str, str->data) == 0) {
+    for (uint32_t i = 0; i < sizeof(keywords) / sizeof(FKeyword); i++) {
+        FKeyword keyword = keywords[i];
+        if (u16cmp(keyword.name, str->data) == 0) {
             FreeString(str);
             FreeStringBuffer(sb);
 
-            return CreateFTokenWithoutValue(keyword.FToken.type);
+            FToken *token = CreateToken(keyword.type, lexer->line, lexer->pos, keyword.name);
+            token->value = keyword.value;
+
+            return token;
         }
-    }*/
+    }
 
     FToken *FToken = CreateToken(TOKEN_IDENTIFIER, lexer->line, lexer->pos, U16('\0'));
     FToken->str = str;

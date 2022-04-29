@@ -3,6 +3,7 @@
 
 #include "AssignOp.h"
 #include "BinOp.h"
+#include "Bool.h"
 #include "Compound.h"
 #include "Expr.h"
 #include "ExprStmt.h"

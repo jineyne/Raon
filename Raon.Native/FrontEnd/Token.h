@@ -12,7 +12,6 @@ extern "C" {
 typedef struct Token {
     ETokenType type;
 
-    FString *op;
     FString *str;
 
     UTokenValue value;
@@ -21,7 +20,7 @@ typedef struct Token {
     size_t pos;
 } FToken;
 
-DLL_EXPORT FToken *CreateToken(ETokenType type, size_t line, size_t pos, u16 *op);
+DLL_EXPORT FToken *CreateToken(ETokenType type, size_t line, size_t pos, u16 *str);
 DLL_EXPORT FToken *CreateTokenWithString(ETokenType type, size_t line, size_t pos, u16 *cstr);
 DLL_EXPORT FToken *CreateTokenFromInteger(size_t line, size_t pos, FString *str, int64_t value);
 DLL_EXPORT FToken *CreateTokenFromReal(size_t line, size_t pos, FString *str, double value);

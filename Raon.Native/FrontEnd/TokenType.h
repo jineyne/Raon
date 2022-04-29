@@ -9,6 +9,7 @@ extern "C" {
 
 typedef enum TokenType {
     TOKEN_IDENTIFIER,
+    TOKEN_BOOL,
     TOKEN_INTEGER,
     TOKEN_REAL,
     TOKEN_STRING,

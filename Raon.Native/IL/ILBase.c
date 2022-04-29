@@ -2,6 +2,7 @@
 
 #include "AssignOp.h"
 #include "BinOp.h"
+#include "Bool.h"
 #include "Compound.h"
 #include "ExprStmt.h"
 #include "ILType.h"
@@ -47,6 +48,10 @@ void FreeIL(FILBase *il) {
 
     case IL_VAR:
         FreeVar(il);
+        break;
+
+    case IL_BOOL:
+        FreeBool(il);
         break;
 
     case IL_INTEGER:

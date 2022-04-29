@@ -1,15 +1,10 @@
 #include "Token.h"
 
-FToken *CreateToken(ETokenType type, size_t line, size_t pos, u16 *op) {
+FToken *CreateToken(ETokenType type, size_t line, size_t pos, u16 *str) {
     FToken *token = malloc(sizeof(FToken));
     token->type = type;
-    if (op != NULL) {
-        token->op = CreateString(op);
-    } else {
-        token->op = NULL;
-    }
 
-    token->str = NULL;
+    token->str = CreateString(str);
     token->value.integer = 0;
 
     token->line = line;
@@ -22,7 +17,6 @@ FToken *CreateToken(ETokenType type, size_t line, size_t pos, u16 *op) {
 FToken *CreateTokenWithString(ETokenType type, size_t line, size_t pos, u16 *cstr) {
     FToken *token = malloc(sizeof(FToken));
     token->type = type;
-    token->op = NULL;
 
     token->str = CreateString(cstr);
     token->value.integer = 0;
@@ -36,7 +30,6 @@ FToken *CreateTokenWithString(ETokenType type, size_t line, size_t pos, u16 *cst
 FToken *CreateTokenFromInteger(size_t line, size_t pos, FString *str, int64_t value) {
     FToken *token = malloc(sizeof(FToken));
     token->type = TOKEN_INTEGER;
-    token->op = NULL;
 
     token->str = str;
     token->value.integer = value;
@@ -50,7 +43,6 @@ FToken *CreateTokenFromInteger(size_t line, size_t pos, FString *str, int64_t va
 FToken *CreateTokenFromReal(size_t line, size_t pos, FString *str, double value) {
     FToken *token = malloc(sizeof(FToken));
     token->type = TOKEN_REAL;
-    token->op = NULL;
 
     token->str = str;
     token->value.real = value;
@@ -64,7 +56,6 @@ FToken *CreateTokenFromReal(size_t line, size_t pos, FString *str, double value)
 FToken *CreateTokenFromString(size_t line, size_t pos, FString *string) {
     FToken *token = malloc(sizeof(FToken));
     token->type = TOKEN_STRING;
-    token->op = NULL;
 
     token->str = CreateString(string->data);
     token->value.integer = 0;
@@ -76,7 +67,6 @@ FToken *CreateTokenFromString(size_t line, size_t pos, FString *string) {
 }
 
 void FreeToken(FToken *token) {
-    FreeString(token->op);
     FreeString(token->str);
     free(token);
 }

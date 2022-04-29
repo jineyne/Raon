@@ -3,11 +3,10 @@
 #include "FrontEnd/Parser.h"
 #include "FrontEnd/SyntaxAnalyzer.h"
 #include "IL/ILBase.h"
-#include "IL/FILAssembler.h"
+#include "IL/ILAssembler.h"
 #include "Utility/Error.h"
 
 TEST(ILAssemblerTest, Global) {
-    SetLocale(LOCALE_KO);
     ClearError();
 
     FParser *parser = nullptr;

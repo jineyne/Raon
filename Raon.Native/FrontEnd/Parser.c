@@ -65,6 +65,7 @@ static bool eat(FParser *parser, char type) {
         parser->token = GetNextToken(parser->lexer);
         return (parser->token != NULL);
     }
+
     ERROR(ERROR_INVALID_SYNTAX, parser->token->str->data);
     return false;
 }
@@ -175,6 +176,10 @@ static FBaseNode *variable(FParser *parser) {
 static FBaseNode *factor(FParser *parser) {
     FToken *token = parser->token;
     FBaseNode *node = NULL;
+    if (token->type == TOKEN_BOOL) {
+        CHECK(eat(parser, TOKEN_BOOL), token)
+        return (FBaseNode*) CreateBoolNode(parser->source, token, token->value.boolean);
+    }
     if (token->type == TOKEN_INTEGER) {
         CHECK(eat(parser, TOKEN_INTEGER), token)
         return (FBaseNode*) CreateIntegerNode(parser->source, token, token->value.integer);

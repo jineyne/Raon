@@ -2,7 +2,7 @@
 
 FVarSymbol *CreateVarSymbol(FString *name, FSymbol *type) {
     FVarSymbol *symbol = malloc(sizeof(FVarSymbol));
-    symbol->name = CreateString(name->data);
+    symbol->name = CopyString(name);
     symbol->symbolType = SYMBOL_VARIABLE;
     symbol->type = type;
     if (type != NULL) {

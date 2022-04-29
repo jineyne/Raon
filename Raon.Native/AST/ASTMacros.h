@@ -8,6 +8,7 @@ extern "C" {
 #define DEFINE_VISITER(RETURN_TYPE, THIS_TYPE) \
     static RETURN_TYPE visitBinOpNode(THIS_TYPE this, FBinOpNode *node); \
     static RETURN_TYPE visitCompoundNode(THIS_TYPE this, FCompoundNode *node); \
+    static RETURN_TYPE visitBoolNode(THIS_TYPE this, FBoolNode *node); \
     static RETURN_TYPE visitIntegerNode(THIS_TYPE this, FIntegerNode *node); \
     static RETURN_TYPE visitRealNode(THIS_TYPE this, FRealNode *node); \
     static RETURN_TYPE visitStringNode(THIS_TYPE this, FStringNode *node); \
@@ -29,6 +30,7 @@ extern "C" {
             VISIT_CASE(AST_BINOP, BinOpNode); \
             VISIT_CASE(AST_ASSIGNOP, AssignOpNode); \
             VISIT_CASE(AST_UNARYOP, UnaryOpNode); \
+            VISIT_CASE(AST_BOOL, BoolNode); \
             VISIT_CASE(AST_INTEGER, IntegerNode); \
             VISIT_CASE(AST_REAL, RealNode); \
             VISIT_CASE(AST_STRING, StringNode); \

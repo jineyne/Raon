@@ -64,6 +64,10 @@ protected:
         return true;
     }
 
+    bool visitBoolNode(FBoolNode *node) override {
+        return true;
+    }
+
     bool visitIntegerNode(FIntegerNode *node) override {
         return true;
     }
@@ -90,8 +94,7 @@ protected:
 };
 
 TEST(ColorGraphTest, Total) {
-    SetLocale(LOCALE_KO);
-    ClearError();
+    InitRaon();
 
     FParser *parser = nullptr;
     FBaseNode *node = nullptr;

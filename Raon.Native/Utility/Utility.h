@@ -11,6 +11,8 @@ extern "C" {
 
 DLL_EXPORT size_t CombineHash(size_t hash, size_t hash2);
 
+DLL_EXPORT void InitRaon();
+
 #ifdef __cplusplus
 }
 #endif
