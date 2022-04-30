@@ -96,6 +96,12 @@ TEST(VMTest, ValueAssignTest) {
     EXPECT_EQ(vm->memory[0].data, -31);
     wprintf(L"\n");
 
+    ExecuteSource(vm, U16("a = -10"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_INT);
+    EXPECT_EQ(vm->memory[0].data, -10);
+    wprintf(L"\n");
+
     ExecuteSource(vm, U16("a = 10.1"));
     EXPECT_EQ(GetErrorCount(), 0);
     EXPECT_EQ(vm->memory[0].type, VALUE_REAL);

@@ -8,6 +8,7 @@ extern "C" {
 #define DEFINE_ILVISITER(RETURN_TYPE, THIS_TYPE) \
     static RETURN_TYPE visitAssignOp(THIS_TYPE this, FAssignOp *il); \
     static RETURN_TYPE visitBinOp(THIS_TYPE this, FBinOp *il); \
+    static RETURN_TYPE visitUnaryOp(THIS_TYPE this, FUnaryOp *il); \
     static RETURN_TYPE visitVar(THIS_TYPE this, FVar *il); \
     static RETURN_TYPE visitBool(THIS_TYPE this, FBool *il); \
     static RETURN_TYPE visitInt(THIS_TYPE this, FInt *il); \
@@ -24,6 +25,7 @@ extern "C" {
         switch (il->type) { \
             VISIT_ILCASE(IL_ASSIGNOP, AssignOp); \
             VISIT_ILCASE(IL_BINOP, BinOp); \
+            VISIT_ILCASE(IL_UNARYOP, UnaryOp); \
             VISIT_ILCASE(IL_VAR, Var); \
             VISIT_ILCASE(IL_BOOL, Bool); \
             VISIT_ILCASE(IL_INTEGER, Int); \

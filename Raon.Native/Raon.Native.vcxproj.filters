@@ -396,4 +396,7 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="grammer_en.txt" />
+  </ItemGroup>
 </Project>

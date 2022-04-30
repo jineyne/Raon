@@ -57,7 +57,6 @@ typedef struct CompilerVisitResult {
 #define VISIT_THROW(NODE) { __result = VISIT(NODE); if (!__result.success) FAILED; }
 
 #define PRINT(EXP) DEBUG_ONLY(wprintf(EXP))
-#define TO(TYPE) ((TYPE *) il)
 
 #define MAKE_OPCODE(OP, O1, O2, O3, O4) (OPERAND(O1, O2, O3, O4) << 16 | OP)
 
@@ -110,10 +109,10 @@ FCompilerVisitResult visitAssignOp(FCompiler *this, FAssignOp *il) {
     BEGIN;
 
     RPHASE;
-    VISIT_GRAP(right, TO(FAssignOp)->right);
+    VISIT_GRAP(right, il->right);
 
     LPHASE;
-    VISIT_GRAP(left, TO(FAssignOp)->left);
+    VISIT_GRAP(left, il->left);
 
     PRINT(U16("MOVE "));
     PRINT_RESULT(left);
@@ -138,13 +137,13 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
     FCompilerVisitResult right = {false, 0, NULL};
 
     RPHASE;
-    VISIT_GRAP_ND(right, TO(FBinOp)->right);
+    VISIT_GRAP_ND(right, il->right);
 
     LPHASE;
-    VISIT_GRAP_ND(left, TO(FBinOp)->left);
+    VISIT_GRAP_ND(left, il->left);
 
     int opcode = 0;
-    switch (TO(FBinOp)->op) {
+    switch (il->op) {
     case OPERATION_ADD:
         opcode = OP_ADD;
         PRINT(U16("ADD "));
@@ -174,6 +173,35 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
     PRINT_COMMA();
     PRINT_RESULT(right);
     PRINT_LN();
+
+    TYPE = R;
+    RESULT = il->operand;
+
+    END;
+}
+
+FCompilerVisitResult visitUnaryOp(FCompiler *this, FUnaryOp *il) {
+    BEGIN;
+
+    FCompilerVisitResult expr = {false, 0, NULL};
+
+    RPHASE;
+    VISIT_GRAP_ND(expr, il->expr);
+
+    if (il->op == OPERATION_SUB) {
+        ARRAY_PUSH(CODES, MAKE_OPCODE(OP_SUB, R, L, expr.type, 0));
+        ARRAY_PUSH(CODES, il->operand);
+        ARRAY_PUSH(CODES, 0);
+        ARRAY_PUSH(CODES, expr.result);
+
+        PRINT(U16("SUB "));
+        PRINT_OP(R, il->operand);
+        PRINT_COMMA();
+        PRINT(U16("0"));
+        PRINT_COMMA();
+        PRINT_RESULT(expr);
+        PRINT_LN();
+    }
 
     TYPE = R;
     RESULT = il->operand;

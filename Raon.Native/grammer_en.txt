@@ -1,0 +1,19 @@
+term		= <boolean> | <integer> | <double> | <string> | <identifier>
+			| "(" <expr> ")"
+			| <unaryop>
+unaryop		= "+" <expr>
+			| "-" <expr>
+
+			
+expr		= <expr7>
+expr7		= <expr6> ( + | - ) <expr6>
+expr6		= <expr1> ( * | / ) <expr1>
+expr1		= <term>
+
+identifier	= <letter> { <letter> | <digit> | "_" }
+double		= [ "-" ] <digit> { <digit> } "." <digit> { <digit> }
+integer		= [ "-" ] <digit> { <digit> }
+boolean		= true | false
+
+letter		= a | b | c | ... | z | A | B | C | ... | Z
+digit		= 0 | 1 | ... | 9

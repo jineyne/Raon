@@ -270,6 +270,9 @@
     <ClCompile Include="Value\Value.c" />
     <ClCompile Include="Runtime\VM.c" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="grammer_en.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

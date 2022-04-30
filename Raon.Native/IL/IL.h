@@ -14,6 +14,7 @@
 #include "Int.h"
 #include "Real.h"
 #include "Str.h"
+#include "UnaryOp.h"
 #include "Var.h"
 
 #include "ILMacros.h"
