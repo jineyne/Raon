@@ -1,18 +1,28 @@
-term		= <boolean> | <integer> | <double> | <string> | <identifier>
-			| "(" <expr> ")"
-			| <unaryop>
-unaryop		= "+" <expr>
-			| "-" <expr>
+compounds	= statement {statement}
+statement	= <expr_stmt>
+			| <assign_stmt>
 
-			
-expr		= <expr7>
+assign_stmt	= <identifier> = <expr>
+expr_stmt	= <expr>
+
+term		= <boolean> | <integer> | <double> | <string> | <identifier>
+			| ( <expr> )
+			| <unaryop>
+unaryop		= + <term>
+			| - <term>
+
+expr		= <expr15>
+expr15		= <expr14> ( || ) <expr14>
+expr14		= <expr10> ( && ) <expr10>
+expr10		= <expr9> ( == | != ) <expr9>
+expr9		= <expr7> ( < | <= | > | >= ) <expr7>
 expr7		= <expr6> ( + | - ) <expr6>
 expr6		= <expr1> ( * | / ) <expr1>
 expr1		= <term>
 
-identifier	= <letter> { <letter> | <digit> | "_" }
-double		= [ "-" ] <digit> { <digit> } "." <digit> { <digit> }
-integer		= [ "-" ] <digit> { <digit> }
+identifier	= <letter> { <letter> | <digit> | _ }
+double		= [ - ] <digit> { <digit> } . <digit> { <digit> }
+integer		= [ - ] <digit> { <digit> }
 boolean		= true | false
 
 letter		= a | b | c | ... | z | A | B | C | ... | Z

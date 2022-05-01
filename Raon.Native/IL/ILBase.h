@@ -17,6 +17,8 @@ typedef struct {
 DLL_EXPORT bool IsStmt(FILBase *il);
 DLL_EXPORT bool IsExpr(FILBase *il);
 
+DLL_EXPORT bool IsConstant(FILBase *il);
+
 DLL_EXPORT void FreeIL(FILBase *il);
 
 #ifdef __cplusplus

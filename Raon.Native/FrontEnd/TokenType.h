@@ -20,7 +20,17 @@ typedef enum TokenType {
     TOKEN_SLASH,
     TOKEN_LPAREN,
     TOKEN_RPAREN,
+
     TOKEN_ASSIGN,
+
+    TOKEN_LT,
+    TOKEN_LTE,
+    TOKEN_GT,
+    TOKEN_GTE,
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_EQ,
+    TOKEN_NEQ,
 
     TOKEN_EOL,
     TOKEN_EOF,

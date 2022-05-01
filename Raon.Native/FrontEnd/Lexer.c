@@ -174,6 +174,16 @@ FToken *GetNextToken(FLexer *lexer) {
             return number(lexer);
         }
 
+        if (lexer->currentChar == U16('(')) {
+            advance(lexer);
+            return CreateToken(TOKEN_LPAREN, lexer->line, lexer->pos, U16("("));
+        }
+
+        if (lexer->currentChar == U16(')')) {
+            advance(lexer);
+            return CreateToken(TOKEN_RPAREN, lexer->line, lexer->pos, U16(")"));
+        }
+
         if (lexer->currentChar == U16('+')) {
             advance(lexer);
             return CreateToken(TOKEN_PLUS, lexer->line, lexer->pos, U16("+"));
@@ -194,14 +204,42 @@ FToken *GetNextToken(FLexer *lexer) {
             return CreateToken(TOKEN_SLASH, lexer->line, lexer->pos, U16("/"));
         }
 
-        if (lexer->currentChar == U16('(')) {
+        if (lexer->currentChar == U16('<')) {
+            if (peek(lexer) == U16('=')) {
+                advance(lexer);
+                advance(lexer);
+                return CreateToken(TOKEN_LTE, lexer->line, lexer->pos, U16("<="));
+            }
+
             advance(lexer);
-            return CreateToken(TOKEN_LPAREN, lexer->line, lexer->pos, U16("("));
+            return CreateToken(TOKEN_LT, lexer->line, lexer->pos, U16("<"));
         }
 
-        if (lexer->currentChar == U16(')')) {
+        if (lexer->currentChar == U16('>')) {
+            if (peek(lexer) == U16('=')) {
+                advance(lexer);
+                advance(lexer);
+                return CreateToken(TOKEN_GTE, lexer->line, lexer->pos, U16(">="));
+            }
+
             advance(lexer);
-            return CreateToken(TOKEN_RPAREN, lexer->line, lexer->pos, U16(")"));
+            return CreateToken(TOKEN_GT, lexer->line, lexer->pos, U16(">"));
+        }
+
+        if (lexer->currentChar == U16('&')) {
+            if (peek(lexer) == U16('&')) {
+                advance(lexer);
+                advance(lexer);
+                return CreateToken(TOKEN_AND, lexer->line, lexer->pos, U16("&&"));
+            }
+        }
+
+        if (lexer->currentChar == U16('|')) {
+            if (peek(lexer) == U16('|')) {
+                advance(lexer);
+                advance(lexer);
+                return CreateToken(TOKEN_OR, lexer->line, lexer->pos, U16("||"));
+            }
         }
 
         if (lexer->currentChar == U16('=')) {

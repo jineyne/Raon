@@ -32,6 +32,18 @@ bool IsExpr(FILBase *il) {
     return false;
 }
 
+bool IsConstant(FILBase *il) {
+    if (il == NULL) {
+        return true;
+    }
+
+    if (IL_BOOL <= il->type && il->type < IL_STRING) {
+        return true;
+    }
+
+    return false;
+}
+
 void FreeIL(FILBase *il) {
     if (il == NULL) {
         return;

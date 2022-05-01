@@ -14,6 +14,7 @@ typedef union Converter16 {
     double real;
     void *pointer;
     char bytes[16];
+    bool boolean;
 } FConverter16;
 
 typedef union Converter8 {
@@ -21,12 +22,14 @@ typedef union Converter8 {
     int32_t integer;
     float real;
     char bytes[8];
+    bool boolean;
 } FConverter8;
 
 typedef union Converter4 {
     uint16_t uinteger;
     int16_t integer;
     char bytes[4];
+    bool boolean;
 } FConverter4;
 
 #ifdef __cplusplus

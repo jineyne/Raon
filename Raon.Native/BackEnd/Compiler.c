@@ -136,31 +136,47 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
     FCompilerVisitResult left = {false, 0, NULL};
     FCompilerVisitResult right = {false, 0, NULL};
 
-    RPHASE;
-    VISIT_GRAP_ND(right, il->right);
+    bool bLeftIsConstant = IsConstant(il->left);
+    bool bRightIsConstant = IsConstant(il->right);
 
-    LPHASE;
-    VISIT_GRAP_ND(left, il->left);
+    if (bLeftIsConstant && !bRightIsConstant) {
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
 
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+    } else if (bRightIsConstant && !bLeftIsConstant) {
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
+    } else {
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
+
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+    }
+
+#define CASE(EXPR) case OPERATION_##EXPR: opcode = OP_##EXPR; PRINT(U16(#EXPR) U16(" ")); break
     int opcode = 0;
     switch (il->op) {
-    case OPERATION_ADD:
-        opcode = OP_ADD;
-        PRINT(U16("ADD "));
-        break;
-    case OPERATION_SUB:
-        opcode = OP_SUB;
-        PRINT(U16("SUB "));
-        break;
-    case OPERATION_MUL:
-        opcode = OP_MUL;
-        PRINT(U16("MUL "));
-        break;
-    case OPERATION_DIV:
-        opcode = OP_DIV;
-        PRINT(U16("DIV "));
+    CASE(ADD);
+    CASE(SUB);
+    CASE(MUL);
+    CASE(DIV);
+    CASE(LT);
+    CASE(LTE);
+    CASE(GT);
+    CASE(GTE);
+    CASE(EQ);
+    CASE(NEQ);
+    CASE(AND);
+    CASE(OR);
         break;
     }
+#undef CASE
 
     ARRAY_PUSH(CODES, MAKE_OPCODE(opcode, R, left.type, right.type, 0));
     ARRAY_PUSH(CODES, il->operand);
@@ -236,18 +252,8 @@ FCompilerVisitResult visitVar(FCompiler *this, FVar *il) {
 FCompilerVisitResult visitBool(FCompiler *this, FBool *il) {
     BEGIN;
 
-    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, B, 0, 0));
-    ARRAY_PUSH(CODES, il->operand);
-    ARRAY_PUSH(CODES, il->value);
-
-    PRINT(U16("MOVE "));
-    PRINT_OP(R, il->operand);
-    PRINT_COMMA()
-    PRINT_OP(B, il->value);
-    PRINT_LN();
-
-    TYPE = R;
-    RESULT = il->operand;
+    TYPE = B;
+    RESULT = il->value;
 
     END;
 }
@@ -255,18 +261,8 @@ FCompilerVisitResult visitBool(FCompiler *this, FBool *il) {
 FCompilerVisitResult visitInt(FCompiler *this, FInt *il) {
     BEGIN;
 
-    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_MOVE, R, L, 0, 0));
-    ARRAY_PUSH(CODES, il->operand);
-    ARRAY_PUSH(CODES, il->value);
-
-    PRINT(U16("MOVE "));
-    PRINT_OP(R, il->operand);
-    PRINT_COMMA()
-    PRINT_OP(L, il->value);
-    PRINT_LN();
-
-    TYPE = R;
-    RESULT = il->operand;
+    TYPE = L;
+    RESULT = il->value;
 
     END;
 }

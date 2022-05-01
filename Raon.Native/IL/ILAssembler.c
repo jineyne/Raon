@@ -101,6 +101,19 @@ EOperation tokenToOp(FToken *str) {
         return OPERATION_MUL;
     case TOKEN_SLASH:
         return OPERATION_DIV;
+
+#define CASE(EXPR) case TOKEN_##EXPR: return OPERATION_##EXPR
+
+    CASE(LT);
+    CASE(LTE);
+    CASE(GT);
+    CASE(GTE);
+    CASE(EQ);
+    CASE(NEQ);
+
+    CASE(AND);
+    CASE(OR);
+#undef CASE
     }
 
     return OPERATION_UNKNOWN;

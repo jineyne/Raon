@@ -58,6 +58,23 @@ typedef enum {
     OP_MUL,
     // DIV r0 r1 r2 => r0 = r1 / r2
     OP_DIV,
+
+    // LT r0 r1 r2 => r0 = r1 < r2
+    OP_LT,
+    // LTE r0 r1 r2 => r0 = r1 <= r2
+    OP_LTE,
+    // GT r0 r1 r2 => r0 = r1 > r2
+    OP_GT,
+    // GTE r0 r1 r2 => r0 = r1 >= r2
+    OP_GTE,
+    // EQ r0 r1 r2 => r0 = r1 == r2
+    OP_EQ,
+    // NEQ r0 r1 r2 => r0 = r1 != r2
+    OP_NEQ,
+    // AND r0 r1 r2 => r0 = r1 && r2
+    OP_AND,
+    // OR r0 r1 r2 => r0 = r1 || r2
+    OP_OR,
 } EOpCode;
 
 #ifdef __cplusplus

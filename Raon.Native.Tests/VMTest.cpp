@@ -124,5 +124,35 @@ TEST(VMTest, ValueAssignTest) {
     EXPECT_EQ((bool) vm->memory[0].data, false);
     wprintf(L"\n");
 
+    ExecuteSource(vm, U16("a = 1 > 2"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, false);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = 1 >= 1"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, true);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = 1 <= 2"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, true);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = true && false"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, false);
+    wprintf(L"\n");
+
+    ExecuteSource(vm, U16("a = true || false"));
+    EXPECT_EQ(GetErrorCount(), 0);
+    EXPECT_EQ(vm->memory[0].type, VALUE_BOOL);
+    EXPECT_EQ((bool) vm->memory[0].data, true);
+    wprintf(L"\n");
+
     FreeVM(vm);
 }
