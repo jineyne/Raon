@@ -64,6 +64,10 @@ protected:
         return true;
     }
 
+    bool visitExprStmtNode(FExprStmtNode *node) override {
+        return visit(node->expr);
+    }
+
     bool visitBoolNode(FBoolNode *node) override {
         return true;
     }
@@ -89,6 +93,19 @@ protected:
     }
 
     bool visitEmptyNode(FEmptyNode *node) override {
+        return true;
+    }
+
+    bool visitBoolOpNode(FBoolOpNode *node) override {
+        return true;
+    }
+
+
+    bool visitIfNode(FIfNode *node) override {
+        visit(node->cond);
+        visit(node->stmt);
+        visit(node->elseExpr);
+
         return true;
     }
 };

@@ -19,13 +19,12 @@ FVM *CreateVM() {
     memset(vm->memory, 0, sizeof(vm->memory));
 
     vm->running = false;
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < REG_COUNT; i++) {
         vm->registers[i].type = VALUE_NONE;
         vm->registers[i].data = 0;
     }
     vm->global = CreateSymbolTable(U16("VM"), NULL);
 
-    vm->zf = false;
     memset(vm->registers, 0, sizeof(vm->registers));
 
     return vm;
@@ -57,7 +56,6 @@ void Execute(FVM *this, FCompilerObject *object) {
         operands = opcode >> 16;
 
         // debug?
-
         this->running = ops[operation].func(this, operands);
     }
 

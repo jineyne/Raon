@@ -1,5 +1,6 @@
 ﻿#include "Parser.h"
 
+#include "AST/IfNode.h"
 #include "Utility/Error.h"
 
 #define CHECK(x, t) if(!x) { FreeNode((FBaseNode*) node); node = NULL; if (t != NULL) { FreeToken(t); t = NULL; } return NULL; }
@@ -11,6 +12,7 @@ static bool eat(FParser *parser, char type);
 static FBaseNode *program(FParser *parser);
 static FBaseNode *compound(FParser *parser);
 static FBaseNode *statement(FParser *parser);
+static FBaseNode *ifStatement(FParser *parser);
 static FBaseNode *assignStatement(FParser *parser);
 static FBaseNode *variable(FParser *parser);
 static FBaseNode *expr(FParser *parser);
@@ -135,18 +137,42 @@ static FBaseNode *statement(FParser *parser) {
     if (parser->token->type == TOKEN_LPAREN) {
         eat(parser, TOKEN_LPAREN);
         node = expr(parser);
-        if (!eat(parser, TOKEN_LPAREN)) {
-            return NULL;
-        }
-
         CHECK(eat(parser, TOKEN_RPAREN), parser->token)
         return node;
+    }
+    if (parser->token->type == TOKEN_LBRACE) {
+        eat(parser, TOKEN_LBRACE);
+        node = compound(parser);
+        CHECK(eat(parser, TOKEN_RBRACE), parser->token)
+        return node;
+    }
+    if (parser->token->type == TOKEN_IF) {
+        return ifStatement(parser);
     }
     if (parser->token->type == TOKEN_IDENTIFIER) {
         return assignStatement(parser);
     }
 
     return (FBaseNode*) CreateEmptyNode(parser->source, parser->token);
+}
+
+static FBaseNode *ifStatement(FParser *parser) {
+    FToken *token = parser->token;
+
+    eat(parser, TOKEN_IF);
+    if (!eat(parser, TOKEN_LPAREN)) {
+        ERROR(ERROR_INVALID_SYNTAX);
+    }
+
+    FBaseNode *cond = expr(parser);
+    FBaseNode *stmt = statement(parser);
+
+    if (parser->token->type != TOKEN_ELSE) {
+        return CreateIfNode(parser->source, token, cond, stmt, NULL);
+    }
+
+    eat(parser, TOKEN_ELSE);
+    return CreateIfNode(parser->source, token, cond, stmt, statement(parser));
 }
 
 static FBaseNode *assignStatement(FParser *parser) {
@@ -285,7 +311,7 @@ static FBaseNode *expr9(FParser *parser) {
         FBaseNode *temp = expr7(parser);
         NULL_CHECK(temp, token)
 
-        node = (FBaseNode*) CreateBinOpNode(parser->source, token, node, temp);
+        node = (FBaseNode*) CreateBoolOpNode(parser->source, token, node, temp);
     }
 
     return node;
@@ -305,7 +331,7 @@ static FBaseNode *expr10(FParser *parser) {
         FBaseNode *temp = expr9(parser);
         NULL_CHECK(temp, token)
 
-        node = (FBaseNode*) CreateBinOpNode(parser->source, token, node, temp);
+        node = (FBaseNode*) CreateBoolOpNode(parser->source, token, node, temp);
     }
 
     return node;

@@ -20,12 +20,14 @@ typedef enum ASTType {
 
     AST_COMPOUND,
     AST_EXPRSTMT,
+    AST_IF,
     AST_EMPTY,
 
     // EXPRESSION
 
     AST_ASSIGNOP,
     AST_BINOP,
+    AST_BOOLOP,
     AST_UNARYOP,
 
 

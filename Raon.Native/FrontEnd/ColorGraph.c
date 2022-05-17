@@ -135,13 +135,22 @@ void ClearColorGraph(FColorGraph *graph) {
     graph->edges = NULL;
 }
 
-int GetColorFromGraph(FColorGraph *graph, FBaseNode *node1) {
-    FColorGraphEdge *edge1;
-    int id1 = (int) hashmap_get(graph->edgeIndex, &node1->hash, 8);
+void SetColorFromGraph(FColorGraph *graph, FBaseNode *node, int color) {
+    FColorGraphEdge *edge;
+    int id1 = (int) hashmap_get(graph->edgeIndex, &node->hash, 8);
+    if (id1 <= 0) {
+        return;
+    }
+    graph->edges[id1 - 1]->color = color;
+}
+
+int GetColorFromGraph(FColorGraph *graph, FBaseNode *node) {
+    FColorGraphEdge *edge;
+    int id1 = (int) hashmap_get(graph->edgeIndex, &node->hash, 8);
     if (id1 <= 0) {
         return -1;
     }
-    edge1 = graph->edges[id1 - 1];
+    edge = graph->edges[id1 - 1];
 
-    return edge1->color;
+    return edge->color;
 }

@@ -29,7 +29,8 @@ DLL_EXPORT void GreedyGraph(FColorGraph *graph);
 
 DLL_EXPORT void ClearColorGraph(FColorGraph *graph);
 
-DLL_EXPORT int GetColorFromGraph(FColorGraph *graph, FBaseNode *node1);
+DLL_EXPORT void SetColorFromGraph(FColorGraph *graph, FBaseNode *node, int color);
+DLL_EXPORT int GetColorFromGraph(FColorGraph *graph, FBaseNode *node);
 
 #ifdef __cplusplus
 }

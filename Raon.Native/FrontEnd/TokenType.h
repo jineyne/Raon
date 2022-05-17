@@ -20,6 +20,11 @@ typedef enum TokenType {
     TOKEN_SLASH,
     TOKEN_LPAREN,
     TOKEN_RPAREN,
+    TOKEN_LBRACE,
+    TOKEN_RBRACE,
+
+    TOKEN_IF,
+    TOKEN_ELSE,
 
     TOKEN_ASSIGN,
 

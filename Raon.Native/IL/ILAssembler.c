@@ -6,8 +6,10 @@
 #include "AssignOp.h"
 #include "BinOp.h"
 #include "Bool.h"
+#include "BoolOp.h"
 #include "Compound.h"
 #include "ExprStmt.h"
+#include "If.h"
 #include "Int.h"
 #include "Real.h"
 #include "Str.h"
@@ -164,6 +166,29 @@ FILAssemblerVisitResult visitBinOpNode(FILAssembler *this, FBinOpNode *node) {
     END;
 }
 
+FILAssemblerVisitResult visitBoolOpNode(FILAssembler *this, FBoolOpNode *node) {
+    BEGIN;
+
+    EXPR(left, node->left)
+    EXPR(right, node->right)
+
+    GENERATION_PHASE
+        EOperation op = tokenToOp(node->location->token);
+        if (op == OPERATION_UNKNOWN) {
+            FAILED;
+        } else {
+            IL = CreateBoolOp(op, left.il, right.il);
+            IL->operand = GetColorFromGraph(this->graph, node);
+        }
+    PHASE_END
+
+    SEARCH_PHASE
+        SetColorFromGraph(this->graph, (FBaseNode*) node, REG_ZF);
+    PHASE_END
+
+    END;
+}
+
 FILAssemblerVisitResult visitCompoundNode(FILAssembler *this, FCompoundNode *node) {
     BEGIN;
 
@@ -297,6 +322,25 @@ FILAssemblerVisitResult visitExprStmtNode(FILAssembler *this, FExprStmtNode *nod
 
     GENERATION_PHASE
         IL = CreateExprStmt(expr.il);
+        PUSH_STMT(IL);
+    PHASE_END
+
+    SEARCH_PHASE
+
+    PHASE_END
+
+    END;
+}
+
+FILAssemblerVisitResult visitIfNode(FILAssembler *this, FIfNode *node) {
+    BEGIN;
+
+    EXPR(cond, node->cond);
+    EXPR(stmt, node->stmt);
+    EXPR(elseExpr, node->elseExpr);
+
+    GENERATION_PHASE
+        IL = CreateIf(cond.il, stmt.il, elseExpr.success ? elseExpr.il : NULL);
         PUSH_STMT(IL);
     PHASE_END
 

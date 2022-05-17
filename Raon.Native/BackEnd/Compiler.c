@@ -166,14 +166,10 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
     CASE(SUB);
     CASE(MUL);
     CASE(DIV);
-    CASE(LT);
-    CASE(LTE);
-    CASE(GT);
-    CASE(GTE);
-    CASE(EQ);
-    CASE(NEQ);
     CASE(AND);
     CASE(OR);
+    default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
         break;
     }
 #undef CASE
@@ -192,6 +188,68 @@ FCompilerVisitResult visitBinOp(FCompiler *this, FBinOp *il) {
 
     TYPE = R;
     RESULT = il->operand;
+
+    END;
+}
+
+FCompilerVisitResult visitBoolOp(FCompiler *this, FBoolOp *il) {
+    BEGIN;
+
+    FCompilerVisitResult left = {false, 0, NULL};
+    FCompilerVisitResult right = {false, 0, NULL};
+
+    bool bLeftIsConstant = IsConstant(il->left);
+    bool bRightIsConstant = IsConstant(il->right);
+
+    if (bLeftIsConstant && !bRightIsConstant) {
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
+
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+    } else if (bRightIsConstant && !bLeftIsConstant) {
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
+    } else {
+        RPHASE;
+        VISIT_GRAP_ND(right, il->right);
+
+        LPHASE;
+        VISIT_GRAP_ND(left, il->left);
+    }
+
+
+#define CASE(EXPR) case OPERATION_##EXPR: opcode = OP_##EXPR; PRINT(U16(#EXPR) U16(" ")); break
+    int opcode = 0;
+    switch (il->op) {
+    CASE(ADD);
+    CASE(SUB);
+    CASE(MUL);
+    CASE(DIV);
+    CASE(AND);
+    CASE(OR);
+    default:
+        Critical(ERROR_OPERAND_NOT_SUPPORT);
+        break;
+    }
+#undef CASE
+
+    ARRAY_PUSH(CODES, MAKE_OPCODE(OP_CMP, left.type, right.type, 0, 0));
+    ARRAY_PUSH(CODES, left.result);
+    ARRAY_PUSH(CODES, right.result);
+
+    PRINT_OP(R, il->operand);
+    PRINT_COMMA();
+    PRINT_RESULT(left);
+    PRINT_COMMA();
+    PRINT_RESULT(right);
+    PRINT_LN();
+
+    TYPE = R;
+    RESULT = REG_ZF;
 
     END;
 }
@@ -321,6 +379,14 @@ FCompilerVisitResult visitExprStmt(FCompiler *this, FExprStmt *il) {
     BEGIN;
 
     VISIT_THROW(il->expr);
+
+    END;
+}
+
+FCompilerVisitResult visitIf(FCompiler *this, FIf *il) {
+    BEGIN;
+
+    // size_t beginOffset = ARRAY_SIZE(CODES);
 
     END;
 }

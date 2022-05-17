@@ -228,6 +228,18 @@
     <ClInclude Include="IL\UnaryOp.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="AST\IfNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IL\If.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="AST\BoolOpNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IL\BoolOp.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Container\Array.c">
@@ -393,6 +405,18 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="IL\UnaryOp.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AST\IfNode.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IL\If.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AST\BoolOpNode.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IL\BoolOp.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

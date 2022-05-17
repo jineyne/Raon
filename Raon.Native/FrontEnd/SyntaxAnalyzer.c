@@ -114,6 +114,18 @@ FSyntaxAnalyzerResult visitBinOpNode(FSyntaxAnalyzer *this, FBinOpNode *node) {
     END;
 }
 
+FSyntaxAnalyzerResult visitBoolOpNode(FSyntaxAnalyzer *this, FBoolOpNode *node) {
+    BEGIN;
+
+    this->limit = LValue;
+    VISIT_GRAP(left, node->left)
+
+    this->limit = RValue;
+    VISIT_GRAP(right, node->right)
+
+    END;
+}
+
 FSyntaxAnalyzerResult visitCompoundNode(FSyntaxAnalyzer *this, FCompoundNode *node) {
     BEGIN;
 
@@ -201,6 +213,16 @@ FSyntaxAnalyzerResult visitExprStmtNode(FSyntaxAnalyzer *this, FExprStmtNode *no
     BEGIN;
 
     VISIT_ANON(node->expr);
+
+    END;
+}
+
+FSyntaxAnalyzerResult visitIfNode(FSyntaxAnalyzer *this, FIfNode *node) {
+    BEGIN;
+
+    VISIT_ANON(node->cond);
+    VISIT_ANON(node->stmt);
+    VISIT_ANON(node->elseExpr);
 
     END;
 }

@@ -1,8 +1,10 @@
 compounds	= statement {statement}
 statement	= <expr_stmt>
 			| <assign_stmt>
+			| <if_stmt>
 
 assign_stmt	= <identifier> = <expr>
+if_stmt		= if ( <expr> ) [ { ] <statements> [ } ] [ else [ { ] <statements> [ } ] ]
 expr_stmt	= <expr>
 
 term		= <boolean> | <integer> | <double> | <string> | <identifier>

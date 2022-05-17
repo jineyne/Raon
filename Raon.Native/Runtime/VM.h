@@ -20,8 +20,7 @@ typedef struct {
 
     size_t pc;
 
-    bool zf;
-    FValue registers[16];
+    FValue registers[REG_COUNT];
 
     FSymbolTable *global;
 } FVM;

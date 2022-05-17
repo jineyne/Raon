@@ -39,6 +39,21 @@ typedef enum {
 } EOperand;
 
 typedef enum {
+    REG_0 = 0,
+    REG_1,
+    REG_2,
+    REG_3,
+    REG_4,
+    REG_5,
+    REG_6,
+    REG_7,
+
+    REG_ZF,
+
+    REG_COUNT,
+};
+
+typedef enum {
     // NOTHING
     OP_NONE,
 
@@ -59,22 +74,34 @@ typedef enum {
     // DIV r0 r1 r2 => r0 = r1 / r2
     OP_DIV,
 
-    // LT r0 r1 r2 => r0 = r1 < r2
-    OP_LT,
-    // LTE r0 r1 r2 => r0 = r1 <= r2
-    OP_LTE,
-    // GT r0 r1 r2 => r0 = r1 > r2
-    OP_GT,
-    // GTE r0 r1 r2 => r0 = r1 >= r2
-    OP_GTE,
-    // EQ r0 r1 r2 => r0 = r1 == r2
-    OP_EQ,
-    // NEQ r0 r1 r2 => r0 = r1 != r2
-    OP_NEQ,
     // AND r0 r1 r2 => r0 = r1 && r2
     OP_AND,
     // OR r0 r1 r2 => r0 = r1 || r2
     OP_OR,
+
+    // COMPARE r0 r1
+    // r0 - r1
+    // 1. r0 > r1 => ZF = 1
+    // 2. r0 < r1 => ZF = -1
+    // 3. r0 = r1 => ZF = 0
+    OP_CMP,
+
+    // ZF == 1
+    OP_JA,
+    // ZF >= 0
+    OP_JAE,
+    // ZF == -1
+    OP_JB,
+    // ZF <= 0
+    OP_JBE,
+    // ZF == 0
+    OP_JE,
+    // ZF != 0
+    OP_JNE,
+    // ZF == 0
+    OP_JZ,
+    // ZF != 0
+    OP_JNZ,
 } EOpCode;
 
 #ifdef __cplusplus

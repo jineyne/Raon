@@ -147,7 +147,9 @@
     <ClInclude Include="AST\ASTMacros.h" />
     <ClInclude Include="AST\BaseNode.h" />
     <ClInclude Include="AST\BoolNode.h" />
+    <ClInclude Include="AST\BoolOpNode.h" />
     <ClInclude Include="AST\ExprStmtNode.h" />
+    <ClInclude Include="AST\IfNode.h" />
     <ClInclude Include="AST\IntegerNode.h" />
     <ClInclude Include="AST\BinOpNode.h" />
     <ClInclude Include="AST\Location.h" />
@@ -168,9 +170,11 @@
     <ClInclude Include="IL\AssignOp.h" />
     <ClInclude Include="IL\BinOp.h" />
     <ClInclude Include="IL\Bool.h" />
+    <ClInclude Include="IL\BoolOp.h" />
     <ClInclude Include="IL\Compound.h" />
     <ClInclude Include="IL\Expr.h" />
     <ClInclude Include="IL\ExprStmt.h" />
+    <ClInclude Include="IL\If.h" />
     <ClInclude Include="IL\IL.h" />
     <ClInclude Include="IL\ILAssembler.h" />
     <ClInclude Include="IL\ILContext.h" />
@@ -217,7 +221,9 @@
     <ClCompile Include="AST\AssignOpNode.c" />
     <ClCompile Include="AST\BaseNode.c" />
     <ClCompile Include="AST\BoolNode.c" />
+    <ClCompile Include="AST\BoolOpNode.c" />
     <ClCompile Include="AST\ExprStmtNode.c" />
+    <ClCompile Include="AST\IfNode.c" />
     <ClCompile Include="AST\IntegerNode.c" />
     <ClCompile Include="AST\BinOpNode.c" />
     <ClCompile Include="AST\Location.c" />
@@ -238,9 +244,11 @@
     <ClCompile Include="IL\AssignOp.c" />
     <ClCompile Include="IL\BinOp.c" />
     <ClCompile Include="IL\Bool.c" />
+    <ClCompile Include="IL\BoolOp.c" />
     <ClCompile Include="IL\Compound.c" />
     <ClCompile Include="IL\Expr.c" />
     <ClCompile Include="IL\ExprStmt.c" />
+    <ClCompile Include="IL\If.c" />
     <ClCompile Include="IL\ILAssembler.c" />
     <ClCompile Include="IL\ILContext.c" />
     <ClCompile Include="IL\ILBase.c" />

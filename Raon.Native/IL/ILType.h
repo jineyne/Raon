@@ -14,6 +14,7 @@ typedef enum {
 
     IL_ASSIGNOP,
     IL_BINOP,
+    IL_BOOLOP,
     IL_UNARYOP,
 
     IL_VAR,
@@ -29,6 +30,7 @@ typedef enum {
     IL_STATEMENT = 0x200,
 
     IL_COMPOUND,
+    IL_IF,
     IL_EXPR_STATEMENT,
 
     IL_STATEMENT_END,

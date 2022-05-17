@@ -116,6 +116,8 @@ static FToken *string(FLexer *lexer) {
 FKeyword keywords[] = {
     {U16("true"), TOKEN_BOOL, true},
     {U16("false"), TOKEN_BOOL, false},
+    {U16("if"), TOKEN_IF, 0},
+    {U16("else"), TOKEN_ELSE, 0},
 };
 
 static FToken *identifier(FLexer *lexer) {
@@ -182,6 +184,16 @@ FToken *GetNextToken(FLexer *lexer) {
         if (lexer->currentChar == U16(')')) {
             advance(lexer);
             return CreateToken(TOKEN_RPAREN, lexer->line, lexer->pos, U16(")"));
+        }
+
+        if (lexer->currentChar == U16('{')) {
+            advance(lexer);
+            return CreateToken(TOKEN_LBRACE, lexer->line, lexer->pos, U16("{"));
+        }
+
+        if (lexer->currentChar == U16('}')) {
+            advance(lexer);
+            return CreateToken(TOKEN_RBRACE, lexer->line, lexer->pos, U16("}"));
         }
 
         if (lexer->currentChar == U16('+')) {
